@@ -1,43 +1,21 @@
-FROM php:8.4-fpm
+FROM php:8.4-cli-bookworm
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libonig-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    curl \
-    zip \
-    libxml2-dev \
-    libicu-dev \
-    libssl-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd intl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev \
+    && docker-php-ext-install pdo_mysql mbstring zip gd intl bcmath pcntl \
+    && rm -rf /var/lib/apt/lists/*
 
-# ----------------------------
-# Install Node.js (LTS version)
-# ----------------------------
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && node -v \
-    && npm -v
-
-# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www
+WORKDIR /app
+COPY . .
 
-# Fix Git "dubious ownership" issue automatically
-RUN git config --system --add safe.directory /var/www
+RUN composer install --no-dev --optimize-autoloader --no-interaction \
+    && mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
+    && chmod -R ug+rwx storage bootstrap/cache
 
-# Ensure correct permissions for Laravel
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www
+ENV APP_ENV=production
+ENV LOG_CHANNEL=stderr
 
-# Switch to www-data user (recommended for Laravel)
-USER www-data
+EXPOSE 8080
+CMD php artisan migrate --force && php artisan serve --host 0.0.0.0 --port ${PORT:-8080}
