@@ -32,6 +32,11 @@ class MustBeStudent
             return redirect('/teacher/dashboard');
         }
 
+        if (\Auth::user()->isParent())
+        {
+            return redirect('/parent/dashboard');
+        }
+
         if (\Auth::user()->isLibrarian())
         {
             return redirect('/library/dashboard');

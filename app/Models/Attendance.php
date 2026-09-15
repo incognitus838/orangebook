@@ -53,7 +53,7 @@ class Attendance extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'standardLink_id' ,'user_id', 'date', 'session','status','reason_id', 'remarks' , 'recorded_by'
+        'school_id' , 'academic_year_id' , 'standardLink_id' ,'user_id', 'date', 'session','status','mark','reason_id', 'remarks' , 'recorded_by'
     ];
 
     /**

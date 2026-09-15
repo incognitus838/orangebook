@@ -55,8 +55,7 @@ trait Dashboard
                               });
 
         $array['parentCount']    =  Cache::remember('parentCount_'.$school_id, env('CACHE_TIME'), function () use ($school_id)                          {
-                                  return User::BySchool($school_id)->ByRole(7)->whereHas('children', function($q) use ($search){
-    
+                                  return User::BySchool($school_id)->ByRole(7)->whereHas('children', function($q) {
                 $q->whereHas('userStudent', function($q) 
                 {
                     $q->where([['status','!=','exit']]);
@@ -94,6 +93,20 @@ trait Dashboard
         $array['subscription']   = Subscription::where('school_id',$school_id)->first();
 
         $array['noticeboard']    = NoticeBoard::where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->orderBy('created_at','DESC')->take(5)->get();
+
+        $today = now()->format('m-d');
+        $array['studentBirthdays'] = Userprofile::with('user')
+            ->where('school_id', $school_id)
+            ->where('usergroup_id', 6)
+            ->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = ?", [$today])
+            ->limit(8)
+            ->get();
+        $array['teacherBirthdays'] = Userprofile::with('user')
+            ->where('school_id', $school_id)
+            ->where('usergroup_id', 5)
+            ->whereRaw("DATE_FORMAT(date_of_birth, '%m-%d') = ?", [$today])
+            ->limit(8)
+            ->get();
 
         //$array['activitylog']    = ActivityLog::where('causer_id',$admin_id)->orderBy('id','DESC')->take(6)->get();
 
@@ -310,6 +323,14 @@ trait Dashboard
             }
         }
     }
+
+        $formClass = \App\Models\StandardLink::with('standard','section')
+            ->where([['school_id',$school_id],['academic_year_id',$academic_year->id],['class_teacher_id',$teacher_id]])
+            ->first();
+        $array['my_class'] = $formClass;
+        $array['my_class_count'] = $formClass
+            ? \App\Models\StudentAcademic::where('standardLink_id', $formClass->id)->count()
+            : 0;
 
         $array['noticeboard']   = NoticeBoard::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['type','!=','class']])->orderBy('created_at','DESC')->take(5)->get();
         $array['upcomingExam']=[];

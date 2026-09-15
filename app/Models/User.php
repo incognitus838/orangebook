@@ -206,6 +206,23 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany('App\Models\StudentParentLink','student_id','id');
     }
 
+    public function parentLinks()
+    {
+        return $this->hasMany(StudentParentLink::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(StudentParentLink::class, 'parent_id');
+    }
+
+    public function childUsers()
+    {
+        return $this->belongsToMany(User::class, 'student_parent_links', 'parent_id', 'student_id')
+            ->where('users.usergroup_id', self::STUDENT_USERGROUP_ID)
+            ->whereNull('student_parent_links.deleted_at');
+    }
+
     /**
      * Get the father of this student.
      *
@@ -257,16 +274,6 @@ class User extends Authenticatable implements HasMedia
 
 
         return $query;
-    }
-
-    /**
-     * Get the child relationships for this parent.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function children()
-    {
-        return $this->hasMany('App\Models\StudentParentLink','parent_id','id');
     }
 
     /**
@@ -1519,6 +1526,18 @@ class User extends Authenticatable implements HasMedia
             (int) self::SCHOOLADMIN_USERGROUP_ID,
             (int) self::SCHOOLSUBADMIN_USERGROUP_ID
         ]);
+    }
+
+    public function isSiteAdmin(): bool
+    {
+        return (int) $this->usergroup_id === (int) self::SITEADMIN_USERGROUP_ID;
+    }
+
+    public function currentSubscription()
+    {
+        return $this->school
+            ? $this->school->subscription()->latest('id')->first()
+            : null;
     }
 
     /**

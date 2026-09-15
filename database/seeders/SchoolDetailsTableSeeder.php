@@ -27,7 +27,7 @@ class SchoolDetailsTableSeeder extends Seeder
                 DB::table('school_details')->Insert([
                     'school_id'     =>  $school->id,
                     'meta_key'      =>  $key,
-                    'meta_value'    =>  '-',
+                    'meta_value'    =>  $key === 'moto' ? 'Knowledge, character, service' : ($key === 'website' ? 'http://127.0.0.1:8000' : 'Lagos, Nigeria'),
                     'created_at'    =>  date("Y-m-d H:i:s"),
                     'updated_at'    =>  date("Y-m-d H:i:s"),
                 ]);
@@ -44,7 +44,7 @@ class SchoolDetailsTableSeeder extends Seeder
         DB::table('school_details')->Insert([
             'school_id'     =>  '1',
             'meta_key'      =>  'board',
-            'meta_value'    =>  'matric',
+            'meta_value'    =>  'WAEC / NERDC',
             'created_at'    =>  date("Y-m-d H:i:s"),
             'updated_at'    =>  date("Y-m-d H:i:s"),
         ]);

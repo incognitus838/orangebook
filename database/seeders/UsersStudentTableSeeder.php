@@ -33,7 +33,9 @@ class UsersStudentTableSeeder extends Seeder
             $i=10000;
             foreach ($classRooms as $classRoom) 
             {
-                $studentCountPerSection = rand(10,12);
+                $isJss2A = ($classRoom->standard->name ?? '') === 'JSS2'
+                    && ($classRoom->section->name ?? '') === 'A';
+                $studentCountPerSection = $isJss2A ? 10 : 5;
 
                 User::factory($studentCountPerSection)
                     ->create([
@@ -44,22 +46,12 @@ class UsersStudentTableSeeder extends Seeder
 
                         $i++;
                     $ageRange = [
-                        1  => [3, 4],
-                        2  => [4, 5],
-                        3  => [5, 6],
-                        4  => [6, 7],
-                        5  => [7, 8],
-                        6  => [8, 9],
-                        7  => [9, 10],
-                        8  => [10, 11],
-                        9  => [11, 12],
-                        10  => [12, 13],
-                        11  => [13, 14],
-                        12  => [14, 15],
-                        13 => [15, 16],
-                        14 => [16, 17],
-                        15 => [17, 18],
-
+                        1 => [10, 12],
+                        2 => [11, 13],
+                        3 => [12, 14],
+                        4 => [13, 15],
+                        5 => [14, 16],
+                        6 => [15, 17],
                     ];
 
                     $standardId = $classRoom->standard->id;
@@ -93,7 +85,7 @@ class UsersStudentTableSeeder extends Seeder
                     ]);
                     
                     // parent
-                    User::factory(2)
+                    User::factory(1)
                     ->create([
                         'school_id'     => $student->school_id,
                         'usergroup_id'  => 7

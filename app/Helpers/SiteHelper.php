@@ -227,6 +227,33 @@ class SiteHelper
      * @param int|string $school_id School identifier
      * @return \Illuminate\Support\Collection|null
      */
+    public static function teacherClassIds($school_id, $teacher_id)
+    {
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        if (!$academic_year) {
+            return collect();
+        }
+
+        $asForm = StandardLink::where([
+            ['school_id', $school_id],
+            ['academic_year_id', $academic_year->id],
+            ['class_teacher_id', $teacher_id],
+        ])->pluck('id');
+
+        $asSubject = Teacherlink::where([
+            ['school_id', $school_id],
+            ['academic_year_id', $academic_year->id],
+            ['teacher_id', $teacher_id],
+        ])->pluck('standardLink_id');
+
+        return $asForm->merge($asSubject)->unique()->values();
+    }
+
+    public static function teacherTeachesClass($school_id, $teacher_id, $standardLinkId): bool
+    {
+        return self::teacherClassIds($school_id, $teacher_id)->contains((int) $standardLinkId);
+    }
+
     public static function getStandardLinkList($school_id)
     {
         $academic_year = SiteHelper::getAcademicYear($school_id);

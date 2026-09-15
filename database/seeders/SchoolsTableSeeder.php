@@ -16,11 +16,11 @@ class SchoolsTableSeeder extends Seeder
     {
         DB::table('schools')->Insert([
             'id'           =>  '1',
-            'name'         =>  'Demo School',
-            'email'        =>  'demoschool@gegok12.com',
-            'phone'        =>  '9500979461',
+            'name'         =>  'Crest Secondary School',
+            'email'        =>  'admin@crest.ng',
+            'phone'        =>  '08035550000',
             'status'       =>  '1',
-            'slug'         =>  'demo-school',
+            'slug'         =>  'crest-secondary',
             'created_at'   =>   date("Y-m-d H:i:s"),
             'updated_at'   =>   date("Y-m-d H:i:s"),
         ]);

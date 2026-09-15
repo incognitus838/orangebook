@@ -4,6 +4,10 @@
     <!-- start -->
     <div class="w-full">
         <h1 class="admin-h1 my-3">Dashboard</h1>
+        <div class="bg-white border px-4 py-3 mb-4 mx-1">
+            <p class="text-sm text-gray-500">This term</p>
+            <a href="{{ url('/student/results') }}" class="text-indigo-700 font-medium text-sm">View results and download report card</a>
+        </div>
         <!-- start -->
         <div class=" flex flex-col lg:flex-row my-2">
             <div class="w-full lg:w-3/4 md:w-full my-2">

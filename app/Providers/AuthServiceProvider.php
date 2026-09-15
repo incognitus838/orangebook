@@ -110,7 +110,16 @@ class AuthServiceProvider extends ServiceProvider
       });
 
       Gate::define('standardlink', function ($user, $standardlink) {
-        return $user->school_id == $standardlink->school_id;
+        if (!$standardlink || $user->school_id != $standardlink->school_id) {
+          return false;
+        }
+        if ($user->isAdmin()) {
+          return true;
+        }
+        if ($user->isTeacher()) {
+          return \App\Helpers\SiteHelper::teacherTeachesClass($user->school_id, $user->id, $standardlink->id);
+        }
+        return true;
       });
 
       Gate::define('standard', function ($user, $standard) {

@@ -21,11 +21,11 @@ class UserprofileFactory extends Factory
 
     $blood_group = $this->faker->randomElement(['a+','b+','o+','ab+','a-','b-','o-','ab-']);
 
-    $mother_tongue = $this->faker->randomElement(['Tamil','Malayalam','Telugu','Kannada','Hindi']);
+    $mother_tongue = $this->faker->randomElement(\App\Support\NigerianNames::TONGUES);
 
-    $caste = $this->faker->randomElement(['BC','BCM','FC','MBC','OBC','Others','SC','SCA','ST']);
+    $caste = $this->faker->randomElement(['Yoruba','Igbo','Hausa','Edo','Ibibio','Others']);
 
-    $city = $this->faker->randomElement(['Bangalore' , 'Chennai' , 'Hyderabad' , 'Mumbai' , 'Thiruvananthapuram']);
+    $city = \App\Support\NigerianNames::city();
 
     $city_id = $this->faker->randomElement(['12' , '24' , '25' , '15' , '13']);
 
@@ -51,8 +51,8 @@ class UserprofileFactory extends Factory
     $this->faker->addProvider(new \Faker\Provider\en_US\Text($this->faker));
 
     return [
-        'firstname'             =>  $this->faker->firstName,
-        'lastname'              =>  $this->faker->lastName,
+        'firstname'             =>  \App\Support\NigerianNames::first($gender),
+        'lastname'              =>  \App\Support\NigerianNames::last(),
         'alternate_no'          =>  $alternate_no,
         'gender'                =>  $gender,
         'date_of_birth'         =>  $date_of_birth, 
@@ -61,7 +61,7 @@ class UserprofileFactory extends Factory
         'native_place'          =>  $city,
         'mother_tongue'         =>  $mother_tongue,
         'caste'                 =>  $caste,
-        'address'               =>  $this->faker->address,
+        'address'               =>  \App\Support\NigerianNames::address(),
         'city_id'               =>  $city_id,
         'state_id'              =>  $state_id,
         'country_id'            =>  7,

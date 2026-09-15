@@ -21,6 +21,7 @@ class RouteServiceProvider extends ServiceProvider
     protected $librarianNamespace = 'App\Http\Controllers\Librarian';
     protected $studentNamespace = 'App\Http\Controllers\Student';
     protected $teacherNamespace = 'App\Http\Controllers\Teacher';
+    protected $parentNamespace = 'App\Http\Controllers\Parent';
     protected $receptionistNamespace = 'App\Http\Controllers\Receptionist';
     protected $accountantNamespace = 'App\Http\Controllers\Accountant';
     protected $payrollNamespace = 'App\Http\Controllers\Payroll';
@@ -58,6 +59,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapLibrarianRoutes();
         $this->mapStudentRoutes();
         $this->mapTeacherRoutes();
+        $this->mapParentRoutes();
         $this->mapReceptionistRoutes();
         $this->mapAccountantRoutes();
         $this->mapPayrollRoutes();
@@ -156,6 +158,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web','auth', 'teacher'])
             ->namespace($this->teacherNamespace)
             ->group(base_path('routes/teacher.php'));
+    }
+
+    protected function mapParentRoutes()
+    {
+        Route::prefix('parent')
+            ->middleware(['web','auth', 'parent'])
+            ->namespace($this->parentNamespace)
+            ->group(base_path('routes/parent.php'));
     }
 
     protected function mapReceptionistRoutes()

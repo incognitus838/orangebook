@@ -2,6 +2,8 @@
 
 //dashboard
 Route::get( '/dashboard', 'DashboardController@index' );
+Route::get('/results', 'ResultsController@index');
+Route::get('/results/pdf', 'ResultsController@pdf');
 Route::get('/dashboard/tasklist/{task_flag}','DashboardController@list');
 Route::get( '/dashboard/task/count','DashboardController@listCount' );
 

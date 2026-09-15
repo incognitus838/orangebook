@@ -19,7 +19,7 @@ class SectionsTableSeeder extends Seeder
 
         foreach ($schools as $school) 
         {
-            $sections = ['A', 'B'];
+            $sections = ['A', 'B', 'Science', 'Arts', 'Commercial'];
 
             foreach ($sections as $section) 
             {

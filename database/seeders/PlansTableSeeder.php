@@ -7,31 +7,44 @@ use Illuminate\Database\Seeder;
 
 class PlansTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * For open-source single school version, we create one unlimited plan
-     *
-     * @return void
-     */
     public function run()
     {
-        // Single unlimited plan for open-source version
-        DB::table('plans')->insert([
-            'cycle'             => '36500', // 100 years
-            'name'              => 'unlimited',
-            'display_name'      => 'UNLIMITED',
-            'amount'            => '0',
-            'no_of_members'     => '999999',
-            'no_of_events'      => '999999',
-            'no_of_folders'     => '999999',
-            'no_of_files'       => '999999',
-            'no_of_videos'      => '999999',
-            'no_of_bulletins'   => '999999',
-            'no_of_groups'      => '999999',
-            'is_active'         => 1,
-            'created_at'        => date("Y-m-d H:i:s"),
-            'updated_at'        => date("Y-m-d H:i:s"),
-        ]);
+        $plans = [
+            [
+                'cycle' => 14,
+                'name' => 'trial',
+                'display_name' => 'Free trial',
+                'order' => 1,
+                'amount' => 0,
+                'no_of_members' => 80,
+            ],
+            [
+                'cycle' => 90,
+                'name' => 'basic',
+                'display_name' => 'Basic',
+                'order' => 2,
+                'amount' => 25000,
+                'no_of_members' => 400,
+            ],
+            [
+                'cycle' => 365,
+                'name' => 'pro',
+                'display_name' => 'Pro',
+                'order' => 3,
+                'amount' => 60000,
+                'no_of_members' => 999999,
+            ],
+        ];
+
+        foreach ($plans as $plan) {
+            DB::table('plans')->updateOrInsert(
+                ['name' => $plan['name']],
+                $plan + [
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
     }
 }

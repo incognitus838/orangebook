@@ -41,7 +41,7 @@ class ParentProfileFactory extends Factory
             $designation       = $this->faker->jobTitle;
             $organization_name = $this->faker->company;
             $official_address  = $this->faker->randomElement([
-                'Bangalore', 'Chennai', 'Hyderabad', 'Mumbai', 'Thiruvananthapuram'
+                'Ikeja', 'Victoria Island', 'Surulere', 'Yaba', 'Ibadan', 'Abuja'
             ]);
             $annual_income     = $this->faker->numerify('#######');
         }

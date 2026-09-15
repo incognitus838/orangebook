@@ -12,7 +12,7 @@
   </table>
   <div style="margin-top: 10px;width: 88%;margin-left: auto;">
      <h3 style="margin-bottom: unset;text-stroke-width:0.5px;text-stroke-color:#fff;font-size: 25px;color: #be123c;font-weight:800;text-align: center;">DEVASAKAYAM</h3>
-     <h6 style="font-weight: 700;font-size: 15px;color: #166534;text-align: center;margin-bottom: unset;">Matric.Hr.Sec.School, Pasumalai, Madurai-625004</h6>
+     <h6 style="font-weight: 700;font-size: 15px;color: #166534;text-align: center;margin-bottom: unset;">Crest Secondary School, Ikeja, Lagos</h6>
   </div>
 <table style="width: 100%;">
   <tbody>
@@ -63,7 +63,7 @@
 
     <div>
       <p style="font-weight: 700;font-size: 13px;color: #1e3a8a;">Parent name :  Rohit Sharma</p>
-      <p style="font-weight: 700;font-size: 13px;color: #1e3a8a;">Address :  29, Thiruvalluvar Nagar, Madurai</p>
+      <p style="font-weight: 700;font-size: 13px;color: #1e3a8a;">Address : Allen Avenue, Ikeja, Lagos</p>
       <p style="font-weight: 700;font-size: 13px;color: #1e3a8a;">Phone : 98765 54321</p>
     </div>
 

@@ -15,7 +15,11 @@ class MustBeSiteAdmin
      */
      public function handle($request, Closure $next)
     {
-         
+        if (method_exists(\Auth::user(), 'isSiteAdmin') && \Auth::user()->isSiteAdmin())
+        {
+            return $next($request);
+        }
+
         if(\Auth::user()->isAdmin())
         {
             return redirect('/admin/dashboard');

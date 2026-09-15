@@ -41,7 +41,12 @@ class StandardsLinkController extends Controller
     public function list()
     {
         //
-        $standardLinks = SiteHelper::getStandardLinkList(Auth::user()->school_id);
+        $school_id = Auth::user()->school_id;
+        $classIds = SiteHelper::teacherClassIds($school_id, Auth::id());
+        $standardLinks = SiteHelper::getStandardLinkList($school_id);
+        if ($standardLinks) {
+            $standardLinks = $standardLinks->whereIn('id', $classIds->all())->values();
+        }
 
         return $standardLinks;
     }
@@ -56,7 +61,8 @@ class StandardsLinkController extends Controller
         //
         $school_id = Auth::user()->school_id;
         $academic_year = SiteHelper::getAcademicYear($school_id);
-        $standardLinks = StandardLink::with('teacherlink','standard','section','teacher')->where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->get();
+        $classIds = SiteHelper::teacherClassIds($school_id, Auth::id());
+        $standardLinks = StandardLink::with('teacherlink','standard','section','teacher')->where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->whereIn('id', $classIds->all())->get();
 
         return view('/teacher/standardlinks/index', [ 'standardLinks' => $standardLinks]);
     }

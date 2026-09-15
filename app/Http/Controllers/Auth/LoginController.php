@@ -37,7 +37,26 @@ class LoginController extends Controller implements ShouldQueue
      * @return string The redirect path
      */
 
-    protected $redirectTo = '/admin/dashboard';
+    public function redirectTo()
+    {
+        $user = Auth::user();
+        if (method_exists($user, 'isSiteAdmin') && $user->isSiteAdmin()) {
+            return '/platform';
+        }
+        if ($user->isParent()) {
+            return '/parent/dashboard';
+        }
+        if ($user->isTeacher()) {
+            return '/teacher/dashboard';
+        }
+        if ($user->isStudent()) {
+            return '/student/dashboard';
+        }
+        if ($user->isLibrarian()) {
+            return '/library/dashboard';
+        }
+        return '/admin/dashboard';
+    }
 
 
     /**

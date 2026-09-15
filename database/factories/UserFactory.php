@@ -37,8 +37,9 @@ class UserFactory extends Factory
      */
     public function definition()
     {
-        $first = $this->faker->firstName;
-        $last  = $this->faker->lastName;
+        $gender = $this->faker->randomElement(['male', 'female']);
+        $first = \App\Support\NigerianNames::first($gender);
+        $last  = \App\Support\NigerianNames::last();
         $uniqueId = $this->faker->unique()->numberBetween(1000, 9999);
 
 
@@ -49,9 +50,9 @@ class UserFactory extends Factory
         );
 
         return [
-            'name' => $first . ' ' . $last . $uniqueId,
-            'email' => strtolower($first . $last . $uniqueId) . '@mailinator.com',
-            'mobile_no' => $this->faker->unique()->numerify('##########'),
+            'name' => $first . ' ' . $last . ' ' . $uniqueId,
+            'email' => strtolower($first . $last . $uniqueId) . '@crest.ng',
+            'mobile_no' => '0803' . $this->faker->unique()->numerify('#######'),
             'password' => bcrypt('password'),
             'email_verification_code' => str_random(40),
             'registration_number' => $this->faker->unique()->numerify('######'),

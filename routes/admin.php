@@ -4,6 +4,19 @@ include ('addon.php');
 
 
 Route::get( '/dashboard', 'DashboardController@index' )->name( 'dashboard' );
+
+Route::get('/crest/branding', 'CrestOpsController@branding');
+Route::post('/crest/branding', 'CrestOpsController@saveBranding');
+Route::get('/crest/billing', 'CrestOpsController@billing');
+Route::post('/crest/billing', 'CrestOpsController@changePlan');
+Route::get('/crest/invite-teacher', 'CrestOpsController@inviteTeacher');
+Route::post('/crest/invite-teacher', 'CrestOpsController@storeTeacher');
+Route::get('/crest/link-parent', 'CrestOpsController@linkParent');
+Route::post('/crest/link-parent', 'CrestOpsController@storeParentLink');
+Route::get('/crest/mail', 'CircularController@create');
+Route::post('/crest/mail', 'CircularController@store');
+Route::get('/crest/mail/log', 'CircularController@log');
+Route::get('/crest/mail/count', 'CircularController@count');
 Route::get( '/dashboard/event', 'DashboardController@event' );
 Route::get( '/dashboard/structuralList', 'DashboardController@structuralList' );
 Route::post( '/dashboard/structuralList', 'DashboardController@showStructuralList' );

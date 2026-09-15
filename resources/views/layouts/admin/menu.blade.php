@@ -6,6 +6,21 @@
             <span class="mx-3 whitespace-no-wrap">Dashboard</span>
         </a>
     </li>
+    <li class="py-3 px-3 {{ Request::segment(3) == 'branding' ? 'active' : '' }}">
+        <a href="{{ url('admin/crest/branding') }}" class="flex items-center"><span class="mx-3">Branding</span></a>
+    </li>
+    <li class="py-3 px-3 {{ Request::segment(3) == 'billing' ? 'active' : '' }}">
+        <a href="{{ url('admin/crest/billing') }}" class="flex items-center"><span class="mx-3">Plan</span></a>
+    </li>
+    <li class="py-3 px-3 {{ Request::segment(3) == 'invite-teacher' ? 'active' : '' }}">
+        <a href="{{ url('admin/crest/invite-teacher') }}" class="flex items-center"><span class="mx-3">Invite teacher</span></a>
+    </li>
+    <li class="py-3 px-3 {{ Request::segment(3) == 'link-parent' ? 'active' : '' }}">
+        <a href="{{ url('admin/crest/link-parent') }}" class="flex items-center"><span class="mx-3">Link parent</span></a>
+    </li>
+    <li class="py-3 px-3 {{ Request::segment(3) == 'mail' ? 'active' : '' }}">
+        <a href="{{ url('admin/crest/mail') }}" class="flex items-center"><span class="mx-3">Circulars</span></a>
+    </li>
 
     <!-- start -->
     @php

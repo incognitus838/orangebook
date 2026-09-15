@@ -14,7 +14,7 @@ class AbsentReasonsTableSeeder extends Seeder
      */
     public function run()
     {
-        $absentReasons = ['Health Issue', 'Family Functions', 'Personal Work', 'Others'];
+        $absentReasons = ['Illness', 'Permission / Excused', 'Late arrival', 'Family emergency', 'Others'];
 
         foreach ($absentReasons as $reason) 
         {

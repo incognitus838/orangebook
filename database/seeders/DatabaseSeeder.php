@@ -28,7 +28,9 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesTableSeeder::class);
         $this->call(SchoolsTableSeeder::class);  
         $this->call(SchoolDetailsTableSeeder::class);  
-        $this->call(AcademicYearsTableSeeder::class);  
+        $this->call(AcademicYearsTableSeeder::class);
+        $this->call(AcademicTermsTableSeeder::class);
+        $this->call(SchoolAcademicSettingsTableSeeder::class);
         $this->call(SectionsTableSeeder::class);  
         $this->call(StandardsTableSeeder::class); 
         $this->call(SubjectsTableSeeder::class); 
@@ -40,7 +42,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call(SubscriptionsTableSeeder::class);  //test //
 
-        $this->call(TeacherTableSeeder::class); //test //
+        $this->call(TeacherTableSeeder::class);
+        $this->call(CrestTeacherSeeder::class);
+        $this->call(ResultsSeeder::class);
+        $this->call(CrestParentSeeder::class);
 
         $this->call(BooksCategoryTableSeeder::class); 
         $this->call(BooksTableSeeder::class); 
@@ -62,7 +67,8 @@ class DatabaseSeeder extends Seeder
 
         // $this->call(HomeworkSeeder::class); //test
         $this->call(NoticeBoardSeeder::class); //test
-        $this->call(PayrollSeeder::class); //test
+        // $this->call(PayrollSeeder::class);
         $this->call(TagSeeder::class);
+        $this->call(CrestSaaSSeeder::class);
     }
 }

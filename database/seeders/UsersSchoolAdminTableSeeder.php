@@ -28,9 +28,9 @@ class UsersSchoolAdminTableSeeder extends Seeder
             //admin
             $schoolAdmin = User::factory()->create([
                 'school_id'    =>   $school->id,
-                'name'         =>   'demoschool',
+                'name'         =>   'Chinedu Balogun',
                 'email'        =>   'demoschool@mailinator.com',
-                'mobile_no'    =>   '2230456789',
+                'mobile_no'    =>   '08035550001',
                 'usergroup_id' =>   3
             ]);
 
@@ -38,14 +38,14 @@ class UsersSchoolAdminTableSeeder extends Seeder
                 'school_id'     =>  $school->id,
                 'user_id'       =>  $schoolAdmin->id,
                 'usergroup_id'  =>  3,
-                'firstname'     =>  'demo',
-                'lastname'      =>  'school',
+                'firstname'     =>  'Chinedu',
+                'lastname'      =>  'Balogun',
                 'profession'    =>  'admin',
-                'address'       =>  'Namakkal,Tamilnadu,India',
+                'address'       =>  'Ikeja, Lagos, Nigeria',
                 'country_id'    =>  7,
                 'city_id'       =>  31,
                 'state_id'      =>  24,
-                'pincode'       =>  '625001'
+                'pincode'       =>  '100001'
             ]);
 
             //librarian
@@ -61,14 +61,14 @@ class UsersSchoolAdminTableSeeder extends Seeder
                 'school_id'     =>  $librarian->school_id,
                 'user_id'       =>  $librarian->id,
                 'usergroup_id'  =>  $librarian->usergroup_id,
-                'firstname'     =>  'librarian',
-                'lastname'      =>  'librarian',
+                'firstname'     =>  'Ngozi',
+                'lastname'      =>  'Eze',
                 'profession'    =>  'librarian',
-                'address'       =>  'Namakkal,Tamilnadu,India',
+                'address'       =>  'Ikeja, Lagos, Nigeria',
                 'country_id'    =>  7,
                 'city_id'       =>  31,
                 'state_id'      =>  24,
-                'pincode'       =>  '625001'
+                'pincode'       =>  '100001'
             ]);
             
             $academic_year = AcademicYear::where([['school_id',$school->id],['status',1]])->first();
@@ -96,11 +96,11 @@ class UsersSchoolAdminTableSeeder extends Seeder
                 'firstname'     =>  'receptionist',
                 'lastname'      =>  'receptionist',
                 'profession'    =>  'others',
-                'address'       =>  'Namakkal,Tamilnadu,India',
+                'address'       =>  'Ikeja, Lagos, Nigeria',
                 'country_id'    =>  7,
                 'city_id'       =>  31,
                 'state_id'      =>  24,
-                'pincode'       =>  '625001'
+                'pincode'       =>  '100001'
             ]);
             
             $academic_year = AcademicYear::where([['school_id',$school->id],['status',1]])->first();
@@ -128,11 +128,11 @@ class UsersSchoolAdminTableSeeder extends Seeder
                 'firstname'     =>  'accountant',
                 'lastname'      =>  'accountant',
                 'profession'    =>  'others',
-                'address'       =>  'Namakkal,Tamilnadu,India',
+                'address'       =>  'Ikeja, Lagos, Nigeria',
                 'country_id'    =>  7,
                 'city_id'       =>  31,
                 'state_id'      =>  24,
-                'pincode'       =>  '625001'
+                'pincode'       =>  '100001'
             ]);
             
             $academic_year = AcademicYear::where([['school_id',$school->id],['status',1]])->first();
@@ -160,11 +160,11 @@ class UsersSchoolAdminTableSeeder extends Seeder
                 'firstname'     =>  'stock_keeper',
                 'lastname'      =>  'stock_keeper',
                 'profession'    =>  'others',
-                'address'       =>  'Namakkal,Tamilnadu,India',
+                'address'       =>  'Ikeja, Lagos, Nigeria',
                 'country_id'    =>  7,
                 'city_id'       =>  31,
                 'state_id'      =>  24,
-                'pincode'       =>  '625001'
+                'pincode'       =>  '100001'
             ]);
             
             $academic_year = AcademicYear::where([['school_id',$school->id],['status',1]])->first();

@@ -78,7 +78,7 @@ class School extends Model
      * @var array
      */
     protected $fillable = [
-        'name' , 'email' , 'phone' , 'address' , 'country_id' , 'state_id' , 'city_id' , 'pincode' , 'slug' , 'status'
+        'name' , 'email' , 'phone' , 'address' , 'country_id' , 'state_id' , 'city_id' , 'pincode' , 'slug' , 'status', 'primary_color', 'custom_domain', 'join_code'
     ];
 
     /**

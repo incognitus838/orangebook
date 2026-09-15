@@ -61,11 +61,11 @@
 	  <div class="py-3 bg-white border border-gray-400 rounded px-3">
 	     	<p class="font-semibold text-red-600">Guidelines for posting</p>
 	     	<ul class="list-disc text-xs leading-loose px-4 py-2">
-	     		<li class="py-1">Lorem Ipsum is simply dummy text</li>
+	     		<li class="py-1">Keep posts about school work only</li>
 	     		<li class="py-1">Various versions have evolved over the years</li>
-	     		<li class="py-1">Lorem Ipsum is simply dummy text</li>
+	     		<li class="py-1">Keep posts about school work only</li>
 	     		<li class="py-1">Various versions have evolved over the years</li>
-	     		<li class="py-1">Lorem Ipsum is simply dummy text</li>
+	     		<li class="py-1">Keep posts about school work only</li>
 	     	</ul>
 	  </div>
 	</div> -->

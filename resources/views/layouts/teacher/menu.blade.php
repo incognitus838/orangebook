@@ -5,6 +5,21 @@
             <span class="mx-3 whitespace-no-wrap">Dashboard</span>
         </a>
     </li>
+    <li class="py-3 px-3 hover:bg-purple-900 {{Request::segment ('2') == 'class' ? 'active':''}}">
+        <a href="{{url('teacher/class')}}" class="flex items-center">
+            <span class="mx-3 whitespace-no-wrap">My Class</span>
+        </a>
+    </li>
+    <li class="py-3 px-3 hover:bg-purple-900 {{Request::segment ('3') == 'results' ? 'active':''}}">
+        <a href="{{url('teacher/class')}}" class="flex items-center">
+            <span class="mx-3 whitespace-no-wrap">Results</span>
+        </a>
+    </li>
+    <li class="py-3 px-3 hover:bg-purple-900 {{Request::segment ('2') == 'mail' ? 'active':''}}">
+        <a href="{{url('teacher/mail')}}" class="flex items-center">
+            <span class="mx-3 whitespace-no-wrap">Circulars</span>
+        </a>
+    </li>
 
     <li class="py-3 px-3 hover:bg-purple-900 {{Request::segment ('2') == 'standardLinks' ? 'active':''}} && {{Request::segment ('2') == 'standardLink' ? 'active':''}}">
         <a href="{{url('/teacher/standardLinks')}}" class="flex items-center whitespace-no-wrap">

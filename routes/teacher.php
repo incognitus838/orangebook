@@ -2,6 +2,18 @@
 
 //dashboard
 Route::get( '/dashboard', 'DashboardController@index' );
+
+Route::get('/class', 'ClassRoomController@index');
+Route::get('/class/{id}', 'ClassRoomController@show');
+Route::post('/class/{id}/attendance', 'ClassRoomController@storeAttendance');
+Route::post('/class/{id}/remarks/{student}', 'ClassRoomController@storeRemark');
+Route::get('/class/{id}/results', 'ResultsController@show');
+Route::post('/class/{id}/results', 'ResultsController@store');
+Route::post('/class/{id}/results/publish', 'ResultsController@publish');
+Route::get('/mail', 'CircularController@create');
+Route::post('/mail', 'CircularController@store');
+Route::get('/mail/log', 'CircularController@log');
+Route::get('/mail/count', 'CircularController@count');
 Route::get( '/dashboard/timetable', 'DashboardController@timetable' );
 Route::get( '/dashboard/tasklist/{task_flag}','DashboardController@list' );
 Route::get( '/dashboard/task/count','DashboardController@listCount' );

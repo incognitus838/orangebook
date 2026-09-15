@@ -83,8 +83,17 @@ trait AuthenticatesUsers
                 ->orWhere('registration_number', request('email'))
                 ->first();
 
+            if (!$users) {
+                return FALSE;
+            }
+
             if ($users->usergroup_id == 1) {
                 return TRUE;
+            }
+
+            $tenant = \App\Support\Tenant::get();
+            if ($tenant && (int) $users->school_id !== (int) $tenant->id) {
+                return FALSE;
             }
 
             $school = School::IsActive($users->school_id)->exists();

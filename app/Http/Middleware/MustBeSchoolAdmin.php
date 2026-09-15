@@ -16,6 +16,11 @@ class MustBeSchoolAdmin
     public function handle($request, Closure $next)
     {
        
+        if(method_exists(\Auth::user(), 'isSiteAdmin') && \Auth::user()->isSiteAdmin())
+        {
+            return redirect('/platform');
+        }
+
         if(\Auth::user()->isAdmin())
         {
             return $next($request);
@@ -29,6 +34,11 @@ class MustBeSchoolAdmin
         if(\Auth::user()->isStudent())
         {
             return redirect('/student/dashboard');
+        }
+
+        if(\Auth::user()->isParent())
+        {
+            return redirect('/parent/dashboard');
         }
         
         if(\Auth::user()->isLibrarian())

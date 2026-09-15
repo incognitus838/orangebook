@@ -43,9 +43,13 @@ class AttendanceController extends Controller
 
         $academic_year = SiteHelper::getAcademicYear($school_id);
 
+        $classIds = SiteHelper::teacherClassIds($school_id, Auth::id());
         $standardLinklist = SiteHelper::getStandardLinkList($school_id);
+        if ($standardLinklist) {
+            $standardLinklist = $standardLinklist->whereIn('id', $classIds->all())->values();
+        }
 
-        $studentAcademic = StudentAcademic::with('user')->where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->whereHas('user', function($q){
+        $studentAcademic = StudentAcademic::with('user')->where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->whereIn('standardLink_id', $classIds->all())->whereHas('user', function($q){
                         $q->where([['status','active'],['deleted_at',null]]);
                     })->get();
         

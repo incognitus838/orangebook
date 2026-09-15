@@ -7,6 +7,11 @@
             <span class="mx-3 whitespace-no-wrap">Dashboard</span>
         </a>
     </li>
+    <li class="py-3 px-3 hover:bg-teal-900 {{Request::segment ('2') == 'results' ? 'active':''}}">
+        <a href="{{url('student/results')}}" class="flex items-center">
+            <span class="mx-3 whitespace-no-wrap">Results</span>
+        </a>
+    </li>
 
     <li class="py-3 px-3 hover:bg-teal-900 {{Request::segment ('2') == 'homework' ? 'active':''}} && {{Request::segment ('2') == 'homeworks' ? 'active':''}}">
         <a href="{{url('student/homeworks')}}" class="flex items-center">

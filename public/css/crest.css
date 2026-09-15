@@ -1,0 +1,503 @@
+:root {
+  --crest-ink: #101828;
+  --crest-paper: #f4f1ea;
+  --crest-rule: #c4bba8;
+  --crest-white: #ffffff;
+  --crest-muted: #2f3a4a;
+  --crest-mark: #8b1e3f;
+  --crest-primary: #101828;
+  --crest-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+html, body,
+.font-primary,
+.font-exo,
+.font-plex,
+.font-sans {
+  font-family: var(--crest-font) !important;
+}
+
+body {
+  color: var(--crest-ink);
+  background: var(--crest-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .admin-h1 {
+  font-family: var(--crest-font);
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+
+.admin-h1 {
+  font-size: 1.5rem;
+  color: var(--crest-ink) !important;
+}
+
+a { color: inherit; }
+
+.crest-shell {
+  min-height: 100vh;
+  background: var(--crest-paper);
+  color: var(--crest-ink);
+}
+
+.crest-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--crest-rule);
+  background: var(--crest-white);
+}
+
+.crest-wordmark {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.crest-nav-links {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.crest-nav-links a {
+  text-decoration: none;
+  color: var(--crest-ink);
+  font-weight: 500;
+}
+
+.crest-btn {
+  display: inline-block;
+  background: var(--crest-ink);
+  color: var(--crest-white) !important;
+  padding: 12px 22px;
+  text-decoration: none;
+  font-size: 14px;
+  border: 0;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+
+.crest-btn-ghost {
+  background: transparent;
+  color: var(--crest-ink) !important;
+  border: 1px solid var(--crest-ink);
+}
+
+.crest-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 64px;
+  padding: 72px 40px 80px;
+  background: var(--crest-ink);
+  color: var(--crest-white);
+  align-items: center;
+}
+
+.crest-hero h1 {
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.05;
+  font-weight: 500;
+  margin: 0 0 20px;
+  max-width: 14ch;
+}
+
+.crest-hero p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #ffffff;
+  max-width: 38ch;
+}
+
+.crest-hero-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.crest-hero .crest-btn { background: var(--crest-white); color: var(--crest-ink) !important; }
+.crest-hero .crest-btn-ghost {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff !important;
+}
+
+.crest-register {
+  background: var(--crest-paper);
+  color: var(--crest-ink);
+  padding: 28px 28px 8px;
+  min-height: 340px;
+}
+
+.crest-register header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--crest-rule);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+
+.crest-register table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.crest-register th,
+.crest-register td {
+  text-align: left;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--crest-rule);
+}
+
+.crest-register th { font-weight: 500; color: var(--crest-muted); font-size: 11px; }
+
+.crest-band {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--crest-rule);
+  background: var(--crest-white);
+}
+
+.crest-band div {
+  padding: 28px 32px;
+  border-right: 1px solid var(--crest-rule);
+}
+
+.crest-band div:last-child { border-right: 0; }
+
+.crest-band strong {
+  display: block;
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.crest-band span { font-size: 13px; color: var(--crest-ink); opacity: 0.85; }
+
+.crest-section {
+  padding: 72px 40px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.crest-section h2 {
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0 0 36px;
+}
+
+.crest-ledger {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  border-top: 1px solid var(--crest-rule);
+}
+
+.crest-ledger dt,
+.crest-ledger dd {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--crest-rule);
+  margin: 0;
+}
+
+.crest-ledger dt {
+  font-size: 13px;
+  color: var(--crest-ink);
+  padding-right: 24px;
+  font-weight: 600;
+}
+
+.crest-ledger dd { font-size: 17px; font-weight: 500; }
+
+.crest-plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid var(--crest-rule);
+  background: var(--crest-white);
+}
+
+.crest-plan {
+  padding: 32px 28px 36px;
+  border-right: 1px solid var(--crest-rule);
+}
+
+.crest-plan:last-child { border-right: 0; }
+
+.crest-plan.is-featured {
+  background: var(--crest-ink);
+  color: var(--crest-white);
+}
+
+.crest-plan h3 { font-size: 20px; margin: 0 0 8px; font-weight: 500; }
+
+.crest-plan .price {
+  font-size: 34px;
+  font-weight: 500;
+  margin: 12px 0 8px;
+}
+
+.crest-plan .price small { font-size: 14px; font-weight: 400; color: inherit; opacity: 0.9; }
+
+.crest-plan ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 28px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.crest-plan.is-featured .crest-btn {
+  background: var(--crest-white);
+  color: var(--crest-ink) !important;
+}
+
+.crest-footer {
+  border-top: 1px solid var(--crest-rule);
+  padding: 28px 40px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--crest-ink);
+  background: var(--crest-white);
+}
+
+.crest-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 73px);
+}
+
+.crest-split-ink {
+  background: var(--crest-ink);
+  color: var(--crest-white);
+  padding: 72px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.crest-split-ink h1 {
+  font-size: 44px;
+  line-height: 1.1;
+  font-weight: 500;
+  max-width: 12ch;
+}
+
+.crest-split-form {
+  padding: 72px 56px;
+  background: var(--crest-paper);
+}
+
+.crest-form label {
+  display: block;
+  font-size: 12px;
+  margin: 16px 0 6px;
+  color: var(--crest-muted);
+}
+
+.crest-form input,
+.crest-form select {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--crest-rule);
+  background: transparent;
+  padding: 8px 0;
+  font-family: var(--crest-font);
+  font-size: 16px;
+  color: var(--crest-ink);
+}
+
+.crest-form input:focus,
+.crest-form select:focus {
+  outline: none;
+  border-bottom-color: var(--crest-ink);
+}
+
+.crest-err { color: var(--crest-mark); font-size: 12px; margin-top: 4px; }
+
+.crest-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--crest-white);
+}
+
+.crest-table th,
+.crest-table td {
+  border-bottom: 1px solid var(--crest-rule);
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.crest-table th {
+  font-weight: 500;
+  color: var(--crest-muted);
+  font-size: 12px;
+}
+
+/* Logged-in app chrome */
+.sidebar > div,
+.admin-sidebar,
+.student-sidebar,
+.teacher-sidebar,
+.sidebar .bg-red-800,
+.sidebar .bg-purple-800,
+.sidebar .bg-purple-700 {
+  background-color: var(--crest-primary) !important;
+}
+
+.student-sidebar li.active,
+.student-sidebar li:hover,
+.teacher-sidebar li.active,
+.admin-sidebar .active,
+.admin-sidebar li:hover,
+.sidebar li.active,
+.sidebar li:hover {
+  background-color: rgba(255,255,255,0.1) !important;
+}
+
+#app > main > div.bg-gray-200 {
+  background: var(--crest-paper) !important;
+}
+
+.empty-layout {
+  background: var(--crest-paper) !important;
+}
+
+.btn.bg-red-600,
+.login-btn,
+.submit-btn {
+  background: var(--crest-ink) !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em;
+}
+
+.crest-panel {
+  background: var(--crest-white);
+  border: 1px solid var(--crest-rule);
+  padding: 20px 22px 8px;
+  height: 100%;
+}
+
+.crest-panel-title {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--crest-rule);
+}
+
+.crest-notice {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--crest-rule);
+}
+
+.crest-notice-meta {
+  font-size: 12px;
+  color: var(--crest-muted);
+  margin: 0 0 6px;
+}
+
+.crest-notice-body {
+  font-size: 15px;
+  line-height: 1.45;
+  margin: 0;
+  font-weight: 500;
+}
+
+.crest-notice-time {
+  font-size: 12px;
+  color: var(--crest-muted);
+  margin: 8px 0 0;
+}
+
+.crest-kicker {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--crest-muted);
+  margin: 0 0 8px;
+}
+
+.crest-person {
+  font-size: 15px;
+  margin: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--crest-rule);
+}
+
+.crest-person span {
+  color: var(--crest-muted);
+  font-size: 13px;
+  margin-left: 6px;
+}
+
+.crest-empty {
+  font-size: 14px;
+  color: var(--crest-muted);
+  padding: 8px 0 16px;
+}
+
+.notice-box .bg-teal-500,
+.notice-box .bg-purple-500,
+.notice-box .bg-orange-500,
+.rounded-full.inline-block.text-white {
+  background: transparent !important;
+  color: var(--crest-muted) !important;
+  border-radius: 0 !important;
+  padding: 0 8px 0 0 !important;
+  font-size: 12px !important;
+  font-weight: 500;
+}
+
+img[src*="birthday.png"] { display: none !important; }
+
+.bg-gray-500 a[title="Send Message"],
+a[title="Send Message"] {
+  background: transparent !important;
+  color: var(--crest-ink) !important;
+  text-transform: none !important;
+  letter-spacing: 0;
+  font-size: 13px !important;
+  border-top: 1px solid var(--crest-rule);
+  padding: 10px 0 !important;
+}
+
+.custom-shadow {
+  box-shadow: none !important;
+  border-color: var(--crest-rule) !important;
+}
+
+.custom-shadow .w-20.h-20.rounded-full {
+  display: none;
+}
+
+.custom-shadow .text-center.py-1 p:first-child {
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--crest-ink);
+}
+
+@media (max-width: 900px) {
+  .crest-hero,
+  .crest-split,
+  .crest-plans,
+  .crest-band,
+  .crest-ledger {
+    grid-template-columns: 1fr;
+  }
+  .crest-nav { padding: 16px 20px; }
+  .crest-hero, .crest-section { padding-left: 20px; padding-right: 20px; }
+  .crest-split-ink, .crest-split-form { padding: 40px 24px; }
+  .crest-band div { border-right: 0; border-bottom: 1px solid var(--crest-rule); }
+  .crest-plan { border-right: 0; border-bottom: 1px solid var(--crest-rule); }
+}

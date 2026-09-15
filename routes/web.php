@@ -6,8 +6,18 @@ use App\Http\Controllers\Superadmin\DashboardController;
   return redirect()->route('login');
     //return view('welcome');
 });*/
-Route::get('/', function () {
-    return redirect()->route('login');
+Route::get('/', 'MarketingController@home');
+Route::get('/start', 'StartSchoolController@create');
+Route::post('/start', 'StartSchoolController@store');
+Route::get('/join', 'JoinController@create');
+Route::post('/join', 'JoinController@store');
+Route::get('/staff/join/{token}', 'StaffJoinController@show');
+Route::post('/staff/join/{token}', 'StaffJoinController@store');
+
+Route::group(['middleware' => ['web', 'auth', 'siteadmin'], 'prefix' => 'platform', 'namespace' => 'Platform'], function () {
+    Route::get('/', 'DashboardController@index');
+    Route::post('/schools/{id}/plan', 'DashboardController@updatePlan');
+    Route::post('/schools/{id}/toggle', 'DashboardController@toggle');
 });
 
 
