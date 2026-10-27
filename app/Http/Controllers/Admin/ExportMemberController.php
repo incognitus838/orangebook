@@ -124,6 +124,9 @@ class ExportMemberController extends Controller
     public function studentexports(Request $request)
     {
         $headings=\Session::get('headings');
+        if (!$headings) {
+            return redirect('/admin/students');
+        }
         $heads=array_values($headings);
 
         $users = $this->MemberFilter($request,Auth::user()->school_id,6,'active');    

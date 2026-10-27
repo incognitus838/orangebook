@@ -42,7 +42,7 @@ class CrestParentSeeder extends Seeder
         }
 
         $parent = User::updateOrCreate(
-            ['email' => 'parent@crest.ng'],
+            ['email' => 'parent@orangebook.ng'],
             [
                 'school_id' => $schoolId,
                 'usergroup_id' => 7,

@@ -47,7 +47,7 @@
       </div>
     </div>
     <div class="flex flex-col lg:flex-row md:flex-row my-6">
-      <p class="w-full lg:w-64 md:flex-row py-2">Where did you hear about GegoK12 ?</p>
+      <p class="w-full lg:w-64 md:flex-row py-2">Where did you hear about Orangebook?</p>
       <div class="grow relative">
         <select name="select" v-model="select" class="block w-full border border-gray-500 p-2 lg:mx-3 md:mx-3 focus:outline-none leading-none " id="grid-state">
           <option value="" disabled>Please select</option>

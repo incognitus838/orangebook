@@ -176,7 +176,7 @@ class UsersTableSeeder extends Seeder
                 'firstname'     =>  'librarian',
                 'lastname'      =>  'librarian',
                 'profession'    =>  'librarian',
-                'address'       =>  'Namakkal,Tamilnadu,India',
+                'address'       =>  'Ikeja, Lagos, Nigeria',
                 'country_id'    =>  '7',
                 'city_id'       =>  '31',
                 'state_id'      =>  '24',

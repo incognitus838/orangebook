@@ -1,90 +1,51 @@
 <?php
-/**
- * SPDX-License-Identifier: MIT
- * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
- */
+
 namespace App\Http\Controllers\Admin\Setting;
 
-use App\Http\Requests\SettingGeneralRequest;
 use App\Http\Controllers\Controller;
-use App\Traits\SettingProcess;
+use App\Helpers\SiteHelper;
+use App\Models\SchoolAcademicSetting;
+use App\Services\ResultsService;
 use Illuminate\Http\Request;
-use App\Traits\Common;
-use Exception;
+use Illuminate\Support\Facades\Auth;
 
-/**
- * Class GeneralController
- *
- * Controller for general site settings (title, name, logo, favicon).
- *
- * @package App\Http\Controllers\Admin\Setting
- */
 class GeneralController extends Controller
 {
-
-    use SettingProcess;
-    use Common;
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function create(ResultsService $results)
     {
-        return view('admin.settings.generalsettings');
+        $year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $settings = $year
+            ? $results->settings(Auth::user()->school_id, $year->id)
+            : null;
+        return view('admin.settings.marks', [
+            'year' => $year,
+            'settings' => $settings,
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request) //SettingGeneralRequest
+    public function store(Request $request)
     {
-        try
-        {
-            $this->updatesettings('sitetitle',$request->sitetitle);
-            $this->updatesettings('sitename',$request->sitename);
-            $this->updatesettings(
-                'assignment_status',
-                $request->has('assignment_status') ? 1 : 0
-            );
-
-            $this->updatesettings(
-                'homework_status',
-                $request->has('homework_status') ? 1 : 0
-            );
-
-            if (($request->sitelogo)==null)
-            {
-                $this->updatesettings('sitelogo',(\config::get('settings.sitelogo')));
-            }
-            else
-            {
-                $name= $request->sitelogo->getClientOriginalName();
-                $sitelogopath=$this->uploadFile('uploads/settings', $request->sitelogo, $name);
-                $this->updatesettings('sitelogo',$sitelogopath);
-            }
-
-            if(($request->favicon)==null)
-            {
-                $this->updatesettings('favicon',(\config::get('settings.favicon')));
-            }
-            else
-            {
-                $name= $request->favicon->getClientOriginalName();
-                $faviconpath=$this->uploadFile('uploads/settings', $request->favicon,$name);
-                $this->updatesettings('favicon',$faviconpath);
-            }
-
-            return redirect()->back()->with('success', 'Settings updated successfully.');
+        $data = $request->validate([
+            'pass_mark' => 'required|integer|min:0|max:100',
+            'ca_max' => 'required|integer|min:0|max:100',
+            'midterm_max' => 'required|integer|min:0|max:100',
+            'exam_max' => 'required|integer|min:0|max:100',
+        ]);
+        $year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        if (!$year) {
+            return back()->with('failmessage', 'Set a current academic year first.');
         }
-        catch(Exception $e)
-        {
-            //dd($e->getMessage());
-            return redirect()->back()->with('error', 'Something went wrong.');
-        }
+        $settings = SchoolAcademicSetting::firstOrCreate(
+            ['school_id' => Auth::user()->school_id, 'academic_year_id' => $year->id],
+            ['grading_scale' => 'waec', 'grade_bands' => SchoolAcademicSetting::waecBands()]
+        );
+        $settings->pass_mark = $data['pass_mark'];
+        $settings->ca_max = $data['ca_max'];
+        $settings->midterm_max = $data['midterm_max'];
+        $settings->exam_max = $data['exam_max'];
+        $settings->ca_weight = $data['ca_max'];
+        $settings->exam_weight = $data['exam_max'];
+        $settings->save();
+        return redirect('/admin/marks')->with('successmessage', 'Mark totals for '.$year->name.' saved.');
     }
 }

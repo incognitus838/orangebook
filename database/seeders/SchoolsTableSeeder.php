@@ -16,11 +16,11 @@ class SchoolsTableSeeder extends Seeder
     {
         DB::table('schools')->Insert([
             'id'           =>  '1',
-            'name'         =>  'Crest Secondary School',
-            'email'        =>  'admin@crest.ng',
+            'name'         =>  'Ikeja Secondary School',
+            'email'        =>  'admin@orangebook.ng',
             'phone'        =>  '08035550000',
             'status'       =>  '1',
-            'slug'         =>  'crest-secondary',
+            'slug'         =>  'ikeja-secondary',
             'created_at'   =>   date("Y-m-d H:i:s"),
             'updated_at'   =>   date("Y-m-d H:i:s"),
         ]);

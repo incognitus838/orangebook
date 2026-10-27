@@ -1,7 +1,7 @@
 # Authentication Tests Documentation
 
 ## Overview
-This directory contains automated tests for user authentication and login functionality across different user roles in the GegoK12 application.
+This directory contains automated tests for user authentication and login functionality across different user roles in Orangebook.
 
 ## Test Structure
 

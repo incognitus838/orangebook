@@ -15,8 +15,8 @@
                             </div>
                             <div class="w-full lg:w-1/2 lg:mr-2">
                                 <div class="my-1">
-                                    <label for="name" class="tw-form-label mr-2">Tamil</label>
-                                    <input type="text" name="tamil" v-model="tamil" placeholder="Tamil" class="tw-form-control w-1/2 mx-4 my-1 py-2">
+                                    <label for="name" class="tw-form-label mr-2">English</label>
+                                    <input type="text" name="tamil" v-model="tamil" placeholder="English" class="tw-form-control w-1/2 mx-4 my-1 py-2">
                                 </div>
                                 <span v-if="errors.tamil" class="text-red-500 text-xs font-semibold">{{ errors.tamil[0] }}</span>
                             </div>
@@ -122,8 +122,8 @@
                 choice_of_language:'',
                 group_selection:'',
                 standard_id:'',
-                boardlist:[ {id:'anglo-indian' , name:'Anglo Indian'} , {id:'cbse' , name:'CBSE'} , {id:'icse' , name:'ICSE'} , {id:'matric' , name:'Matric'} , {id:'state-board' , name:'State Board'} , {id:'others' , name:'Others'} ],
-                languagelist:[ {id:'tamil' , name:'Tamil'} , {id:'hindi' , name:'Hindi'} , {id:'sanskrit' , name:'Sanskrit'} , {id:'french' , name:'French'} ],
+                boardlist:[ {id:'waec' , name:'WAEC'} , {id:'neco' , name:'NECO'} , {id:'nerdc' , name:'NERDC'} , {id:'state-board' , name:'State Ministry'} , {id:'others' , name:'Others'} ],
+                languagelist:[ {id:'english' , name:'English'} , {id:'yoruba' , name:'Yoruba'} , {id:'igbo' , name:'Igbo'} , {id:'hausa' , name:'Hausa'} ],
                 grouplist:[ 
                     {id:'group1' , name:'Group 1    :   Maths, Physics, Chemistry &Computer Science'} , 
                     {id:'group2' , name:'Group 2    :   Maths, Physics, Chemistry & Biology'} , 

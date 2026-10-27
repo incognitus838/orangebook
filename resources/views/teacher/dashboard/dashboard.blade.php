@@ -82,8 +82,7 @@
 
         <!-- start -->
         <div class="flex flex-wrap lg:flex-row md:flex-row">
-           
-
+            @if(false)
             <!-- start -->
             <div class="w-full lg:w-1/4  md:w-1/2 my-3 lg:my-0 md:my-2 px-1">
                 <div class="bg-white px-3 py-2 h-full">
@@ -150,6 +149,7 @@
                 </div>
             </div>
             <!-- end -->
+            @endif
 
             <!-- start -->
             @if(config('gexam.enabled', false))

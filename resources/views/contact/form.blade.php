@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('title')
-GegoK12 - Contact Form 
+Orangebook - Contact Form 
 @endsection
 
 @section('content')
@@ -14,7 +14,7 @@ GegoK12 - Contact Form
 	<div class="flex flex-col lg:flex-row">
 		<div class="w-full lg:w-2/3 px-8 lg:px-24 lg:my-16 md:my-16 my-5">
 		<h2 class="text-2xl font-plex mb-8">Contact Form</h2>
-		<p class="text-sm leading-relaxed lg:mr-24 mr-0">Enter your query or feedback in the form given below. Our support team will get back to you. You can also directly mail us at support@gegosoft.com</p>
+		<p class="text-sm leading-relaxed lg:mr-24 mr-0">Write to us here. We write back. You can also mail hello@orangebook.ng.</p>
 		<div class="lg:mr-24 mr-0">
 			<!-- <form action="{{url('/contact')}}" method="post" enctype="multipart/form-data">
 				{{csrf_field()}} -->
@@ -24,7 +24,7 @@ GegoK12 - Contact Form
 		</div>
 		<div class="w-full lg:w-1/3 p-4 lg:pr-32 lg:mt-32 md:mt-32 mt-6">
 			<h3 class="font-bold text-xl mb-4">Head Office</h3>
-			<h4 class="font-exo">Gegosoft</h4>
+			<h4 class="font-exo">Orangebook</h4>
 			<p class="font-exo">8-6/8, Vaigai Nathi Street</p>
 			<p class="font-exo">Mahathma Gandhi Nagar</p>
 			<p class="font-exo">Ikeja, Lagos</p>

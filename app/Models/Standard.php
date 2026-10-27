@@ -50,7 +50,7 @@ class Standard extends Model
      * @var array
      */
     protected $fillable = [
-       'school_id' ,  'name' ,'slug' , 'order' , 'status'
+       'school_id' ,  'name' ,'slug' , 'order' , 'status', 'is_entry'
     ];
 
     /**

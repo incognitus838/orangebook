@@ -22,7 +22,7 @@
                 </tr>
             @endforeach
         </table>
-        <a href="{{ url('/student/results/pdf') }}" class="inline-block bg-gray-900 text-white text-sm px-4 py-2">Download report card (PDF)</a>
+        <a href="{{ url('/student/results/pdf') }}" class="crest-btn" style="margin-top:24px">Download report card (PDF)</a>
     @endif
 </div>
 @endsection

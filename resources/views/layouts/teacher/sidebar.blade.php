@@ -1,10 +1,11 @@
-<div class="w-full lg:w-48 md:w-48  h-full bg-purple-800 text-white teacher-sidebar">
-  <div class="min-h-full header-wrapper-b hidden lg:block md:block ">
+<div class="ob-rail ob-rail-desktop crest-app-sidebar text-white teacher-sidebar">
+  <div class="min-h-full header-wrapper-b hidden lg:block md:block">
    @include('layouts.teacher.menu')
   </div>
 </div>
-<div id="res_sidebar" class="w-full lg:w-48 md:w-48  hidden lg:hidden md:hidden res_sidebar teacher-sidebar">
-  <div class="min-h-full header-wrapper-b lg:hidden md:hidden bg-purple-700 text-white">
+<div id="res_sidebar" class="hidden res_sidebar" onclick="if(event.target===this)showsidebar('res_sidebar')">
+  <div class="min-h-full header-wrapper-b ob-rail ob-rail-drawer crest-app-sidebar text-white teacher-sidebar" onclick="event.stopPropagation()">
+   <button type="button" class="crest-rail-close ob-rail-close" onclick="showsidebar('res_sidebar')">Close</button>
    @include('layouts.teacher.menu')
   </div>
 </div>

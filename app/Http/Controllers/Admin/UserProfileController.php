@@ -58,8 +58,7 @@ class UserProfileController extends Controller
             );       
         } 
            
-        $res['message']=__('admin_userprofile.password_update');
-        return $res;
+        return redirect()->back()->with('successmessage', 'Password saved.');
     }
 
     public function changeavatar(Request $request)
@@ -93,7 +92,9 @@ class UserProfileController extends Controller
         try
         {
             $userprofile = Userprofile::where('user_id', Auth::id())->first();
-           // $path=$this->uploadFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar);
+            if (!$userprofile) {
+                return redirect()->back()->with('failmessage', 'No profile to attach a photo to.');
+            }
 
             $path = \Storage::putFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar,'public');
 
@@ -114,17 +115,39 @@ class UserProfileController extends Controller
                 LOGNAME_CHANGE_AVATAR,
                 'Changed Avatar'
             );  
-            return $res; 
+            return redirect()->back()->with('successmessage', 'Photo saved.');
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
+            return redirect()->back()->with('failmessage', 'Could not save that photo.');
         }
     }
 
     public function edit(Request $request)
     {  
         return view('/admin/editprofile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = User::findOrFail(Auth::id());
+        $data = $request->validate([
+            'name' => 'required|string|max:80|unique:users,name,'.$user->id,
+            'email' => 'required|email|max:120|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+        ]);
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->mobile_no = $data['phone'] ?: $user->mobile_no;
+        $user->save();
+        $parts = preg_split('/\s+/', trim($data['name']), 2);
+        $profile = Userprofile::where('user_id', $user->id)->first();
+        if ($profile) {
+            $profile->firstname = $parts[0];
+            $profile->lastname = $parts[1] ?? $profile->lastname;
+            $profile->save();
+        }
+        return redirect('/admin/editprofile')->with('successmessage', 'Profile saved.');
     }
 
     public function create()

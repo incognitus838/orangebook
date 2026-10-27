@@ -57,7 +57,6 @@ class UserProfileController extends Controller
             );         
         } 
            
-        $res['message']=__('admin_userprofile.password_update');
-        return $res;
+        return redirect()->back()->with('successmessage', 'Password saved.');
     }
 }

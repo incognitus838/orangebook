@@ -23,22 +23,12 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(\App\Services\SchoolDayService $day)
     {
-        //
-        $school_id          =   Auth::user()->school_id;
-        $student_id         =   Auth::id();
-        $student            =   User::where('id',$student_id)->first();
-        $standardLink_id    =   $student->studentAcademicLatest->standardLink_id;
-        
-        if($request->exam_date != null)
-        {
-            $exam_date          =   date('Y-m-d H:i:s',strtotime($request->exam_date));
-        }
-
-        $dashboard = $this->studentDashboard($school_id,$student,$standardLink_id,$request->subject,$request->exam,$request->mark,$exam_date);
-
-        return view('/student/dashboard/dashboard', ['dashboard' => $dashboard]);
+        return view('crest.day.dashboard', [
+            'layout' => 'layouts.student.layout',
+            'day' => $day->student(Auth::user()),
+        ]);
     }
 
     public function list(Request $request,$task_flag)

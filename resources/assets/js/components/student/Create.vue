@@ -111,17 +111,7 @@
         </div> 
       </div>
       
-      <div class="tw-form-group w-full lg:w-2/5">
-        <div class="lg:mr-8 md:mr-8">
-          <div class="mb-2">
-            <label for="aadhar_number" class="tw-form-label">Aadhaar Number</label>
-          </div>
-          <div class="mb-2">
-            <input type="text" class="tw-form-control w-full" id="aadhar_number" v-model="aadhar_number" name="aadhar_number" Placeholder="Aadhar Number">
-          </div>
-          <span v-if="errors.aadhar_number" class="text-red-500 text-xs font-semibold">{{errors.aadhar_number[0]}}</span>
-        </div> 
-      </div>
+
     </div>
 
      <GoogleMap
@@ -551,7 +541,7 @@ export default {
       standard:'',
       city_id:'',
       state_id:'',
-      country_id:7,
+      country_id:10,
       pincode:'',
       birth_place:'',
       native_place:'',

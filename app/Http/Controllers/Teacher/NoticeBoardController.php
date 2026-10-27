@@ -72,11 +72,27 @@ class NoticeBoardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    { 
-        $query = \Request::getQueryString();
+    public function index(\App\Services\SchoolBoardService $board)
+    {
+        $classes = $board->teacherClasses(Auth::user());
+        return view('crest.board.notices', [
+            'layout' => 'layouts.teacher.layout',
+            'notices' => $board->noticesForViewer(Auth::user()),
+            'classes' => $classes,
+            'action' => url('/teacher/notices'),
+            'canAdd' => true,
+        ]);
+    }
 
-        return view('/teacher/noticeboard/index' ,['query' => $query]);
+    public function storeNotice(\Illuminate\Http\Request $request, \App\Services\SchoolBoardService $board)
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:120',
+            'body' => 'required|string|max:240',
+            'class_id' => 'nullable|integer',
+        ]);
+        $board->addNotice(Auth::user(), $data);
+        return redirect('/teacher/notices')->with('successmessage', 'Notice posted.');
     }
 
     //new 

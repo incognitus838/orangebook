@@ -6,10 +6,10 @@
 <div class="crest-split">
     <aside class="crest-split-ink">
         <h1>{{ $invite->school->name }}</h1>
-        <p style="color:rgba(255,255,255,.72);margin-top:16px;">{{ $invite->name }}, set a password to join as a teacher. This invite expires {{ $invite->expires_at->format('d M Y') }}.</p>
+        <p>{{ $invite->name }}, set a password to join as a teacher. This invite expires {{ $invite->expires_at->format('d M Y') }}.</p>
     </aside>
     <div class="crest-split-form">
-        <h2 style="font-size:28px;margin:0 0 8px;">Set your password</h2>
+        <h2>Set your password</h2>
         @include('partials.message')
         <form method="POST" action="{{ url('/staff/join/'.$invite->token) }}" class="crest-form">
             @csrf

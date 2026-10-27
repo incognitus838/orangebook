@@ -1,23 +1,28 @@
 @extends('layouts.admin.layout')
 @section('content')
-<div>
-    <h1 class="admin-h1 my-3">Link parent to student</h1>
+<div class="ob-page">
+    <div class="ob-head">
+        <h1 class="admin-h1">{{ optional(Auth::user()->school)->usesParents() ? 'Link parent' : 'Emergency contact' }}</h1>
+        <a href="{{ url('/admin/parents') }}">Back to parents</a>
+    </div>
     @include('partials.message')
-    <form method="POST" action="{{ url('/admin/crest/link-parent') }}" class="bg-white border p-4 max-w-lg">
+    <form method="POST" action="{{ url('/admin/link-parent') }}" class="ob-form">
         @csrf
-        <label class="block text-sm mt-2">Parent name</label>
-        <input class="border px-2 py-1 w-full" name="name" required>
-        <label class="block text-sm mt-2">Parent email</label>
-        <input class="border px-2 py-1 w-full" type="email" name="email" required>
-        <label class="block text-sm mt-2">Temporary password</label>
-        <input class="border px-2 py-1 w-full" name="password" value="password" required>
-        <label class="block text-sm mt-2">Child (this school only)</label>
-        <select class="border px-2 py-1 w-full" name="student_id" required>
+        <label>Name</label>
+        <input type="text" name="name" value="{{ old('name') }}" required>
+        <label>Email</label>
+        <input type="email" name="email" value="{{ old('email') }}" required>
+        <label>Phone</label>
+        <input type="text" name="phone" value="{{ old('phone') }}">
+        <label>Child</label>
+        <select name="student_id" required>
+            <option value="">Choose student</option>
             @foreach($students as $student)
-                <option value="{{ $student->id }}">{{ $student->name }}</option>
+                <option value="{{ $student->id }}" @selected(old('student_id') == $student->id)>{{ $student->name }}</option>
             @endforeach
         </select>
-        <button class="mt-4 bg-gray-900 text-white text-sm px-4 py-2">Link parent</button>
+        <p class="text-sm" style="margin-top:16px;color:var(--crest-muted)">Login password is password. Parents can also join themselves at {{ url('/join') }} with the school code {{ Auth::user()->school->join_code }}.</p>
+        <button class="crest-btn" type="submit" style="margin-top:24px">Link parent</button>
     </form>
 </div>
 @endsection

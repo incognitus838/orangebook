@@ -21,15 +21,12 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(\App\Services\SchoolDayService $day)
     {
-        //
-        $teacher_id = Auth::id();
-        $school_id  = Auth::user()->school_id;
-
-        $dashboard = $this->teacherDashboard( $school_id, $teacher_id );
-        
-        return view( '/teacher/dashboard/dashboard',['dashboard' => $dashboard]);
+        return view('crest.day.dashboard', [
+            'layout' => 'layouts.teacher.layout',
+            'day' => $day->teacher(Auth::user()),
+        ]);
     }
 
     /**

@@ -1,12 +1,17 @@
 @extends($role === 'teacher' ? 'layouts.teacher.layout' : 'layouts.admin.layout')
 
 @section('content')
-<div>
-    <h1 class="admin-h1 my-3">Write a circular</h1>
+<div class="ob-page">
+    <div class="ob-head">
+        <h1 class="admin-h1">Write a circular</h1>
+        <a href="{{ $logUrl }}">Sent mail</a>
+    </div>
     @include('partials.message')
-    <p class="text-sm mb-4" style="color:var(--crest-muted)">Only people in this school. Each parent gets their own copy. <a href="{{ $logUrl }}">Sent mail</a></p>
+    <p class="ob-help">
+        Only people in this {{ strtolower(optional(Auth::user()->school)->orgWord() ?? 'organisation') }}. They will also see it on the notice board.
+    </p>
 
-    <form method="POST" action="{{ $action }}" class="crest-form bg-white border p-4" style="border-color:var(--crest-rule);max-width:640px">
+    <form method="POST" action="{{ $action }}" class="ob-form">
         @csrf
         <label for="template">Template</label>
         <select id="template">
@@ -16,13 +21,15 @@
             @endforeach
         </select>
 
+        @if(!empty($fullTarget))
+            @include('crest.board._target')
+        @else
         <label for="audience">To</label>
         <select id="audience" name="audience" required>
-            @foreach($audiences as $value => $label)
+            @foreach($audiences ?? [] as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
         </select>
-
         <div id="class-wrap">
             <label for="class_id">Class</label>
             <select id="class_id" name="class_id">
@@ -32,69 +39,77 @@
                 @endforeach
             </select>
         </div>
-
         <div id="parent-wrap" style="display:none">
             <label for="parent_id">Parent</label>
             <select id="parent_id" name="parent_id">
                 <option value="">Choose parent</option>
-                @foreach($parents as $parent)
+                @foreach($parents ?? [] as $parent)
                     <option value="{{ $parent->id }}">{{ $parent->name }} · {{ $parent->email }}</option>
                 @endforeach
             </select>
         </div>
-
-        <p id="count-line" class="text-sm" style="color:var(--crest-muted);margin:12px 0 0">This will go to — people.</p>
+        @endif
 
         <label for="subject">Subject</label>
         <input id="subject" name="subject" required maxlength="180">
 
         <label for="body">Message</label>
-        <textarea id="body" name="body" rows="10" required maxlength="5000" style="width:100%;border:0;border-bottom:1px solid var(--crest-rule);font-family:var(--crest-font);font-size:16px;padding:8px 0;background:transparent"></textarea>
-        <p class="text-xs" style="color:var(--crest-muted)">You can use {parent_name}, {student_name}, {class}, {school_name}.</p>
+        <textarea id="body" name="body" rows="6" required maxlength="5000"></textarea>
 
-        <button class="crest-btn" type="submit" style="margin-top:24px">Send</button>
+        <button class="crest-btn" type="submit">Send</button>
     </form>
+
+    @if(isset($mailReady) && !$mailReady)
+        <p class="ob-help" style="margin-top:16px">Circulars are kept on this list. They go out by email when mail is switched on.</p>
+    @endif
+
+    @if(!empty($recent) && $recent->count())
+        <div class="ob-sent mt-8">
+            <h2 class="font-semibold mb-2">Recently sent</h2>
+            <table class="crest-table">
+                <thead>
+                    <tr><th>When</th><th>To</th><th>Subject</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    @foreach($recent as $row)
+                        @php
+                            $st = strtolower((string) $row->status);
+                            $stLabel = $st === 'failed' ? 'Not sent' : ($st === 'delivered' ? 'Sent' : ucfirst((string) $row->status));
+                        @endphp
+                        <tr>
+                            <td>{{ optional($row->fired_at)->format('d M H:i') ?: $row->created_at->format('d M H:i') }}</td>
+                            <td>{{ $row->to }}</td>
+                            <td>{{ $row->subject }}</td>
+                            <td>{{ $stLabel }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <p class="text-sm mt-2"><a href="{{ $logUrl }}">Full sent list</a></p>
+        </div>
+    @endif
 </div>
 <script>
 (function () {
   var templates = document.getElementById('template');
+  if (templates) {
+    templates.addEventListener('change', function () {
+      var opt = templates.options[templates.selectedIndex];
+      if (!opt.value) return;
+      document.getElementById('subject').value = opt.getAttribute('data-subject');
+      document.getElementById('body').value = opt.getAttribute('data-body');
+    });
+  }
   var audience = document.getElementById('audience');
+  if (!audience) return;
   var classWrap = document.getElementById('class-wrap');
   var parentWrap = document.getElementById('parent-wrap');
-  var countLine = document.getElementById('count-line');
-  var countUrl = @json($countUrl);
-
-  templates.addEventListener('change', function () {
-    var opt = templates.options[templates.selectedIndex];
-    if (!opt.value) return;
-    document.getElementById('subject').value = opt.getAttribute('data-subject');
-    document.getElementById('body').value = opt.getAttribute('data-body');
-  });
-
   function toggle() {
     var v = audience.value;
-    classWrap.style.display = (v === 'class') ? 'block' : 'none';
-    parentWrap.style.display = (v === 'parent') ? 'block' : 'none';
-    refreshCount();
+    if (classWrap) classWrap.style.display = (v === 'class') ? 'block' : 'none';
+    if (parentWrap) parentWrap.style.display = (v === 'parent') ? 'block' : 'none';
   }
-
-  function refreshCount() {
-    var params = new URLSearchParams({
-      audience: audience.value,
-      class_id: document.getElementById('class_id').value,
-      parent_id: document.getElementById('parent_id').value
-    });
-    fetch(countUrl + '?' + params.toString(), { credentials: 'same-origin' })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        countLine.textContent = 'This will go to ' + data.count + ' ' + (data.count === 1 ? 'person' : 'people') + '.';
-      })
-      .catch(function () {});
-  }
-
   audience.addEventListener('change', toggle);
-  document.getElementById('class_id').addEventListener('change', refreshCount);
-  document.getElementById('parent_id').addEventListener('change', refreshCount);
   toggle();
 })();
 </script>

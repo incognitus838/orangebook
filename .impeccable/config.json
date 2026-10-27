@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "public/css/ob-saas.css"
+        ],
+        "createdAt": "2026-10-27T12:39:55.315Z",
+        "reason": "Agent: only .sx-grad-text on the marketing hero (home.blade.php); user approved the homepage rebuild. Desk UI uses solid ink."
+      }
+    ]
+  }
+}

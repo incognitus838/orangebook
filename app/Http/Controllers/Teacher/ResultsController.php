@@ -14,6 +14,7 @@ use App\Models\Subject;
 use App\Models\Teacherlink;
 use App\Models\TermResult;
 use App\Services\ResultsService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -22,6 +23,25 @@ class ResultsController extends Controller
 {
     public function __construct(private ResultsService $results)
     {
+    }
+
+    public function index()
+    {
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $formClass = StandardLink::where([
+            ['school_id', $schoolId],
+            ['academic_year_id', $year->id],
+            ['class_teacher_id', Auth::id()],
+        ])->first();
+        if ($formClass) {
+            return redirect('/teacher/class/' . $formClass->id . '/results');
+        }
+        $first = SiteHelper::teacherClassIds($schoolId, Auth::id())->first();
+        if ($first) {
+            return redirect('/teacher/class/' . $first . '/results');
+        }
+        return view('teacher.classroom.empty');
     }
 
     public function show(Request $request, $id)
@@ -60,6 +80,8 @@ class ResultsController extends Controller
             ->get()
             ->keyBy('student_id');
 
+        $gaps = $this->results->classGaps($term->id, $class->id);
+
         return view('teacher.results.show', [
             'class' => $class,
             'term' => $term,
@@ -71,6 +93,7 @@ class ResultsController extends Controller
             'audits' => $audits,
             'termResults' => $termResults,
             'isFormTeacher' => (int) $class->class_teacher_id === (int) Auth::id(),
+            'gaps' => $gaps,
         ]);
     }
 
@@ -105,10 +128,33 @@ class ResultsController extends Controller
         }
         $year = SiteHelper::getAcademicYear(Auth::user()->school_id);
         $term = AcademicTerm::where('school_id', Auth::user()->school_id)->where('academic_year_id', $year->id)->where('is_current', true)->firstOrFail();
-        $this->results->publishClass(Auth::user()->school_id, $term->id, $class->id);
+        try {
+            $this->results->publishClass(Auth::user()->school_id, $term->id, $class->id);
+        } catch (\RuntimeException $e) {
+            return redirect('/teacher/class/' . $class->id . '/results')
+                ->with('failmessage', $e->getMessage() . '. Fill them before publish.');
+        }
 
         return redirect('/teacher/class/' . $class->id . '/results')
-            ->with('successmessage', 'First Term results published. Students can now view report cards.');
+            ->with('successmessage', $term->name . ' results published. Students and parents can now open the report card.');
+    }
+
+    public function pdf($id, $studentId)
+    {
+        $class = $this->class($id);
+        $student = StudentAcademic::where('standardLink_id', $class->id)
+            ->where('user_id', $studentId)
+            ->with('user')
+            ->firstOrFail()
+            ->user;
+        $report = $this->results->reportForStudent($student);
+        if (!$report['termResult'] || !$report['termResult']->published_at) {
+            return redirect('/teacher/class/' . $class->id . '/results')
+                ->with('failmessage', 'Publish the term first.');
+        }
+        $pdf = Pdf::loadView('student.results.report', $report)->setPaper('a4');
+        $name = 'report-card-' . str_replace(' ', '-', strtolower($student->name)) . '.pdf';
+        return $pdf->download($name);
     }
 
     private function class($id): StandardLink
@@ -122,10 +168,10 @@ class ResultsController extends Controller
 
     private function teacherSubjects(StandardLink $class)
     {
-        $ids = Teacherlink::where('standardLink_id', $class->id)
-            ->where('teacher_id', Auth::id())
-            ->pluck('subject_id');
-
-        return Subject::whereIn('id', $ids)->orderBy('name')->get();
+        $query = Teacherlink::where('standardLink_id', $class->id);
+        if ((int) $class->class_teacher_id !== (int) Auth::id()) {
+            $query->where('teacher_id', Auth::id());
+        }
+        return Subject::whereIn('id', $query->pluck('subject_id'))->orderBy('name')->get();
     }
 }

@@ -41,11 +41,28 @@ class SchoolDetailsController extends Controller
      */
     public function index()
     {
-        $details = SchoolDetail::where('school_id', Auth::user()->school_id)->get()->keyby('meta_key');
+        $school = School::where('id', Auth::user()->school_id)->first();
+        return view('admin/schooldetails/index', ['school' => $school]);
+    }
 
-        $school  = School::where('id', Auth::user()->school_id)->first();
-
-        return view('admin/schooldetails/index',[ 'details' => $details , 'school' => $school]);
+    public function saveSimple(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:120',
+            'email' => 'nullable|email|max:120',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+        ]);
+        $school = School::where('id', Auth::user()->school_id)->firstOrFail();
+        $school->name = $data['name'];
+        $school->email = $data['email'] ?? $school->email;
+        $school->phone = $data['phone'] ?? $school->phone;
+        $school->address = $data['address'];
+        if (!$school->join_code) {
+            $school->join_code = \App\Services\SchoolJoinService::makeJoinCode($school);
+        }
+        $school->save();
+        return redirect('/admin/schooldetails')->with('successmessage', 'School details saved.');
     }
 
     /**

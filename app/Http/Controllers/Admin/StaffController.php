@@ -409,6 +409,9 @@ class StaffController extends Controller
     public function staffexports(Request $request)
     {
         $headings = \Session::get('staff_headings');
+        if (!$headings) {
+            return redirect('/admin/teachers?role=nonteaching');
+        }
         $heads = array_values($headings);
 
         $users = $this->StaffFilter($request,Auth::user()->school_id,[8,10,11,12,13]);

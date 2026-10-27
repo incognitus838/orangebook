@@ -36,6 +36,7 @@
                     </div>
 
                     <!--upcoming holidays-->
+                    @if(false)
                     <div class="w-full lg:w-1/3 px-1 my-1">
                         <a href="{{ url('/student/holidays') }}" target="_blank">
                             <div class="bg-white custom-shadow px-4 py-3 border flex items-center">
@@ -49,6 +50,7 @@
                             </div>
                         </a>
                     </div>
+                    @endif
                     <!--upcoming holidays-->        
                 </div>
                 <div class="flex my-2 flex-col lg:flex-row md:flex-row">

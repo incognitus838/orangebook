@@ -15,7 +15,7 @@ class NoticeBoardFactory extends Factory
         $notices = [
             ['PTA meeting', 'Parents are invited to the PTA meeting in the school hall at 10:00am on Saturday. Please come with your ward’s report folder.'],
             ['First Term exams', 'First Term examinations begin on Monday. Students should arrive by 7:30am with their writing materials. No phones in the hall.'],
-            ['Inter-house sports', 'Crest Secondary School inter-house sports holds this Friday on the school field. House captains should submit names today.'],
+            ['Inter-house sports', 'Ikeja Secondary School inter-house sports holds this Friday on the school field. House captains should submit names today.'],
             ['School fees reminder', 'Second-term fees should be paid into the school account before resumption. See the bursar for the account details.'],
             ['Cultural day', 'Cultural Day is next week Thursday. Students may wear traditional attire. Yoruba, Igbo and Hausa performances start at 11am.'],
             ['WAEC registration', 'SS3 students must complete WAEC registration with the exams officer this week. Bring two passport photographs.'],

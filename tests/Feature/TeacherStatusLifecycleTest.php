@@ -82,7 +82,7 @@ class TeacherStatusLifecycleTest extends TestCase
         ]);
 
         // Assert successful login
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/teacher/dashboard');
         $this->assertAuthenticatedAs($teacher);
 
         // Logout for next test

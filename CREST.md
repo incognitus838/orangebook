@@ -1,6 +1,6 @@
-# Crest — multi-tenant school SaaS
+# Orangebook — multi-tenant school SaaS
 
-Fork of **[GegoK12](https://github.com/Gego-K12/gegok12)** (MIT). Upstream copyright: GegoSoft Technologies and GegoK12 Contributors. We keep their license notice; Crest is the product name we sell.
+Fork of **[GegoK12](https://github.com/Gego-K12/gegok12)** (MIT). Upstream copyright: GegoSoft Technologies and GegoK12 Contributors. We keep their license notice; Orangebook is the product name we sell.
 
 GegoK12 already has multi-school isolation (`school_id` on every record), the five roles we need, attendance, parent links, subscriptions/plans, branding (logo + school details), spreadsheet import, and activity logs. We are not rewriting that.
 
@@ -118,20 +118,32 @@ Open http://127.0.0.1:8000/login
 | Role | Login | Password | Lands on |
 |---|---|---|---|
 | School Admin | `demoschool@mailinator.com` | `password` | `/admin/dashboard` |
-| Teacher (JSS2A form teacher) | `teacher@crest.ng` | `password` | `/teacher/class` then Results |
-| Student | e.g. `ucheabdullahi5531@crest.ng` | `password` | `/student/dashboard` |
-| Parent | `parent@crest.ng` | `password` | `/parent/dashboard` |
-| Platform owner | `platform@crest.ng` | `password` | `/platform` |
+| Teacher (JSS2A form teacher) | `teacher@orangebook.ng` | `password` | `/teacher/class` then Results |
+| Student (JSS2A) | `student@orangebook.ng` | `password` | `/student/dashboard` |
+| Parent | `parent@orangebook.ng` | `password` | `/parent/dashboard` |
+| Platform owner | `platform@orangebook.ng` | `password` | `/platform` |
 | Queens College admin (2nd school) | `admin@queens.ng` | `password` | `/admin/dashboard` |
 | Parent | e.g. `catharinelangosh6746@mailinator.com` | `password` | mobile API only in upstream |
 
-Verified: login page (title **Crest**), school admin dashboard (200, Demo School), student dashboard (200, attendance + homework). Login emails are disabled locally (`MAIL_STATUS=off`) so Mailtrap SMTP does not 500.
+From school admin, **Open desk** on a teacher, learner, or parent record opens their desk. The banner returns you to admin.
+
+Verified: login page (title **Orangebook**), school admin dashboard (200, Demo School), student dashboard (200, attendance + homework). Login emails are disabled locally (`MAIL_STATUS=off`) so Mailtrap SMTP does not 500.
 
 Default school slug: `demo-school`.
 
+## Intake, Admissions, and Promotions
+
+These three screens do different jobs and should not be mixed:
+
+- **Admissions** (`/admin/admissions`, public `/{slug}/admission-form`) is the application pile. Approving a form marks it Approved. Those names then appear as pre-filled rows on **New intake**.
+- **Intake** (`/admin/students/intake`) creates the entry-level cohort for the current year (JSS1, Primary 1, Cohort 1, or a first course). Paste or CSV, then auto-balance across arms. Login slips print after confirm.
+- **Promotions** (`/admin/promotions`) moves existing learners up a level at year-end. It does not create new people.
+
+Training firms may put the same learner in more than one course in a year (`student_academics` one row per course). Attendance and results still key off `studentAcademicLatest` (the newest row) unless a class is chosen on the register.
+
 ## What we change in this fork (small, on purpose)
 
-- Product name **Crest**
+- Product name **Orangebook**
 - Default timezone `Africa/Lagos` for West African secondary schools
 - Class seed renamed to **JSS1–JSS3 / SS1–SS3** (instead of Indian 1–12) once the first local run is green
 - Exam/results + Nigerian A1–F9 scale + term report PDF — next slice

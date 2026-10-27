@@ -1,131 +1,109 @@
 @extends('layouts.admin.layout')
 
 @section('content')
-    <div class="relative">
-        <div class="flex flex-wrap lg:flex-row justify-between my-3">
-            <div class="">
-                <h1 class="admin-h1 my-3">Reports</h1>
-            </div>
-            <div class="relative flex items-center w-1/4 lg:justify-end">
-                <div class="flex items-center" dusk="add-button">
-                    <a href="{{ url('/admin/reports') }}" class="btn btn-reset bg-gray-100 text-gray-700 border rounded px-3 py-1 ml-3 text-sm font-medium">Reset Filters</a>
-                </div>
-            </div>
-        </div>
-        @include('partials.message')
+<div class="ob-page">
+    <div class="ob-head">
+        <h1 class="admin-h1">Reports</h1>
     </div>
+    <p class="text-sm mb-4" style="color:var(--crest-muted)">
+        {{ optional($overview['term'])->name ?? 'This term' }}
+        @if($overview['year']) · {{ $overview['year']->name }} @endif
+        · by class
+    </p>
 
-    <div class="flex flex-col lg:flex-row">
-        <div class="flex flex-wrap w-full lg:w-1/2 lg:mr-3 my-2">
-            <div class="bg-white shadow border border-grey px-5 py-3 w-full">
-                <div class="flex flex-wrap lg:flex-row justify-between my-3">
-                    <div>
-                        <h1 class="admin-h1 mb-5 flex items-center"> Student </h1>
-                    </div>
-                    <div class="w-full lg:w-2/4">
-                        <div id="search"></div>
-                        <div id="memberfilter"></div>
-                    </div>
-                    <div class="mx-2 relative flex items-center w-1/2 lg:justify-end">
-                        <search-filter url="{{ url('/') }}" searchquery="{{ $query }}" type="report"></search-filter>
-                    </div>
-                </div>
-                <ul class="leading-loose list-disc px-5">
-                    <li>
-                        <a href="{{ url('/admin/report/activeStudents?status=active&'.$query) }}"> Active Students </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/admin/report/suspendedStudents?status=inactive&'.$query) }}"> Suspended Students </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/admin/report/exitStudents?status=exit&'.$query) }}"> Exit Students </a>
-                    </li>
-                    @if(config('gfee.enabled', false))
-                    <li>
-                        <a href="{{ url('/admin/report/fees?'.$query) }}"> Fees Paid History </a>
-                    </li>
-                    @endif    
-                </ul>  
-            </div>
+    <form method="GET" action="{{ url('/admin/reports') }}" class="ob-filters">
+        <div>
+            <label>Class</label>
+            <select name="class_id" onchange="this.form.submit()">
+                <option value="">All classes</option>
+                @foreach($classes as $class)
+                    <option value="{{ $class->id }}" @selected((string) $classId === (string) $class->id)>{{ $class->StandardSection }}</option>
+                @endforeach
+            </select>
         </div>
-    </div>
+        <noscript><button class="crest-btn" type="submit">Show</button></noscript>
+    </form>
 
-    <div class="flex flex-col lg:flex-row">
-        <div class="flex flex-wrap w-full lg:w-1/2 lg:mr-3 my-2">
-            <div class="bg-white shadow border border-grey px-5 py-3 w-full">
-                <p>
-                    <h1 class="admin-h1 mb-5 flex items-center"> Important Dates </h1>
-                </p>
-                <ul class="leading-loose list-disc px-5">
-                    <li>
-                        <a href="{{ url('/admin/report/birthday/student') }}"> Student's Birthday </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/admin/report/birthday/teacher') }}"> Teacher's Birthday </a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/admin/report/exportHolidays') }}"> Holidays List </a>
-                    </li>  
-                </ul>  
+    @if(!$overview['term'])
+        <p class="bg-white border p-4">No current term is set.</p>
+    @else
+        @forelse($resultsByClass as $className => $rows)
+            <div class="ob-table-wrap mb-6">
+                <h2 class="font-medium px-4 pt-4 pb-2">{{ $className }} · results</h2>
+                <table class="crest-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Average</th>
+                            <th>Position</th>
+                            <th>Attendance</th>
+                            <th>Missing marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($rows as $row)
+                            <tr>
+                                <td>{{ $row['student']->name }}</td>
+                                <td>{{ $row['average'] ?? '—' }}{{ $row['grade'] ? ' · '.$row['grade'] : '' }}</td>
+                                <td>
+                                    @if($row['position'])
+                                        {{ $row['position'] }} / {{ $row['class_size'] }}
+                                    @else
+                                        —
+                                    @endif
+                                </td>
+                                <td>{{ $row['attendance'] !== null ? $row['attendance'].'%' : '—' }}</td>
+                                <td>{{ $row['missing'] > 0 ? $row['missing'].' subject'.($row['missing'] === 1 ? '' : 's') : 'Complete' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
-
-    <div class="flex flex-col lg:flex-row">
-        <div class="flex flex-wrap w-full lg:w-1/2 lg:mr-3 my-2">
-            <div class="bg-white shadow border border-grey px-5 py-3 w-full">
-                <div class="flex flex-wrap lg:flex-row justify-between my-3">
-                    <div>
-                        <h1 class="admin-h1 mb-5 flex items-center"> Parent </h1>
-                    </div>
-                    <div class="w-full lg:w-2/4">
-                        <div id="parent_search"></div>
-                        <div id="parentfilter"></div>
-                    </div>
-                    <div class="mx-2 relative flex items-center w-1/2 lg:justify-end">
-                        <parent-search-filter url="{{ url('/') }}" searchquery="{{ $query }}" mode="report"></parent-search-filter>
-                    </div>
-                </div>
-                <ul class="leading-loose list-disc px-5">
-                    <li>
-                        <a href="{{ url('/admin/report/parents?'.$query) }}"> Parent History </a>
-                    </li>    
-                </ul>  
-            </div>
-        </div>
-    </div>
-
-    @if(config('ginventory.enabled', false))
-    <div class="flex flex-col lg:flex-row">
-        <div class="flex flex-wrap w-full lg:w-1/2 lg:mr-3 my-2">
-            <div class="bg-white shadow border border-grey px-5 py-3 w-full">
-                <div class="flex flex-wrap lg:flex-row justify-between my-3">
-                    <div>
-                        <h1 class="admin-h1 mb-5 flex items-center"> Stock History </h1>
-                    </div>
-                     <div class="w-full lg:w-2/4">
-                        <div id="stock_search"></div>
-                        <div id="stockfilter"></div>
-                    </div>
-                    <div class="mx-2 relative flex items-center w-1/2 lg:justify-end">
-                        <stock-search-filter url="{{ url('/') }}" searchquery="{{ $query }}"></stock-search-filter>
-                    </div>
-                </div>
-                <ul class="leading-loose list-disc px-5"> 
-                    <li>
-                        <a href="{{ url('/admin/report/currentstock') }}"> Current Stock Report </a>
-                    </li>  
-
-                    <li>
-                        <a href="{{ url('/admin/report/monthlypurchase?'.$query) }}"> Monthly Purchase Report </a>
-                    </li> 
-
-                    <li>
-                        <a href="{{ url('/admin/report/monthlysales?'.$query) }}"> Monthly Sales Report </a>
-                    </li>    
-                </ul>  
-            </div>
-        </div>
-    </div>
+        @empty
+            <p class="bg-white border p-4 mb-6">No learners yet.</p>
+        @endforelse
     @endif
+
+    @forelse($studentsByClass as $className => $group)
+        <div class="ob-table-wrap mb-6">
+            <h2 class="font-medium px-4 pt-4 pb-2">{{ $className }} · {{ optional(Auth::user()->school)->learnerWord() }}</h2>
+            <table class="crest-table">
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Phone</th></tr>
+                </thead>
+                <tbody>
+                    @foreach($group as $student)
+                        <tr>
+                            <td>{{ $student->name }}</td>
+                            <td>{{ $student->email }}</td>
+                            <td>{{ $student->mobile_no ?: '—' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @empty
+        <p class="bg-white border p-4 mb-6">No {{ strtolower(optional(Auth::user()->school)->learnerWord() ?? 'students') }} yet.</p>
+    @endforelse
+
+    <div class="ob-table-wrap">
+        <h2 class="font-medium px-4 pt-4 pb-2">{{ optional(Auth::user()->school)->staffWord() }}</h2>
+        <table class="crest-table">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Phone</th></tr>
+            </thead>
+            <tbody>
+                @forelse($teachers as $teacher)
+                    <tr>
+                        <td>{{ $teacher->name }}</td>
+                        <td>{{ $teacher->email }}</td>
+                        <td>{{ $teacher->mobile_no ?: '—' }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="3">None yet.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 @endsection

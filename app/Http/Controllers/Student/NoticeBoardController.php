@@ -49,10 +49,15 @@ class NoticeBoardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    { 
-        $query = \Request::getQueryString();
-
-        return view('/student/noticeboard/index' ,['query' => $query]);
+    public function index(\App\Services\SchoolBoardService $board)
+    {
+        $classId = optional(Auth::user()->studentAcademicLatest)->standardLink_id;
+        return view('crest.board.notices', [
+            'layout' => 'layouts.student.layout',
+            'notices' => $board->noticesForViewer(Auth::user()),
+            'classes' => collect(),
+            'action' => url('/student/notices'),
+            'canAdd' => false,
+        ]);
     }  
 }

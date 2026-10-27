@@ -27,11 +27,11 @@ class UserprofileFactory extends Factory
 
     $city = \App\Support\NigerianNames::city();
 
-    $city_id = $this->faker->randomElement(['12' , '24' , '25' , '15' , '13']);
+    $city_id = $this->faker->randomElement([66, 67, 68, 69, 70]);
 
-    $state_id = $this->faker->randomElement(['12' , '24' , '25' ,  '15' , '13']);
+    $state_id = 30;
 
-    $pincode = $this->faker->unique()->numerify('######');
+    $pincode = $this->faker->randomElement(['100001', '100271', '101233', '102103']);
 
     $registration_number = $this->faker->unique()->numerify('######');
 
@@ -64,7 +64,7 @@ class UserprofileFactory extends Factory
         'address'               =>  \App\Support\NigerianNames::address(),
         'city_id'               =>  $city_id,
         'state_id'              =>  $state_id,
-        'country_id'            =>  7,
+        'country_id'            =>  10,
         'pincode'               =>  $pincode, 
         'registration_number'   =>  $registration_number,
         'EMIS_number'           =>  $EMIS_number,

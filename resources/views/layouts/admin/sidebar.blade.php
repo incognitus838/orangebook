@@ -1,10 +1,11 @@
-<div class="w-full h-full lg:w-48 md:w-48 bg-red-800 text-white">
-  <div class="min-h-full header-wrapper-b hidden lg:block md:block ">
+<div class="ob-rail ob-rail-desktop crest-app-sidebar text-white">
+  <div class="min-h-full header-wrapper-b hidden lg:block md:block">
    @include('layouts.admin.menu')
   </div>
 </div>
-<div id="res_sidebar" class="w-full lg:w-48 md:w-48 admin-sidebar hidden lg:hidden md:hidden res_sidebar ">
-  <div class="min-h-full header-wrapper-b lg:hidden md:hidden bg-red-800">
+<div id="res_sidebar" class="hidden res_sidebar" onclick="if(event.target===this)showsidebar('res_sidebar')">
+  <div class="min-h-full header-wrapper-b ob-rail ob-rail-drawer crest-app-sidebar" onclick="event.stopPropagation()">
+   <button type="button" class="crest-rail-close ob-rail-close" onclick="showsidebar('res_sidebar')">Close</button>
    @include('layouts.admin.menu')
   </div>
 </div>

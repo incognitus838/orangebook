@@ -60,10 +60,61 @@ class ReportsController extends Controller
      */
     public function report(Request $request)
     {
-        //
-        $query = \Request::getQueryString();
-        
-        return view("/admin/reports/reports",['query' => $query]);
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $classes = $year
+            ? \App\Models\StandardLink::with('standard', 'section')
+                ->where('school_id', $schoolId)
+                ->where('academic_year_id', $year->id)
+                ->get()
+                ->sortBy(function ($class) {
+                    return sprintf('%03d-%s', optional($class->standard)->order ?? 99, optional($class->section)->name ?? '');
+                })
+                ->values()
+            : collect();
+        $classId = $request->query('class_id');
+
+        $students = User::where('school_id', $schoolId)
+            ->where('usergroup_id', 6)
+            ->with('studentAcademicLatest.standardLink.standard', 'studentAcademicLatest.standardLink.section')
+            ->when($classId, function ($q) use ($classId) {
+                $q->whereHas('studentAcademicLatest', fn ($s) => $s->where('standardLink_id', $classId));
+            })
+            ->orderBy('name')
+            ->get();
+        $teachers = User::where('school_id', $schoolId)->where('usergroup_id', 5)->orderBy('name')->get();
+        $overview = app(\App\Services\ResultsService::class)->schoolTermOverview($schoolId);
+
+        if ($classId) {
+            $overview['rows'] = collect($overview['rows'])->filter(function ($row) use ($classId) {
+                $id = optional(optional($row['student']->studentAcademicLatest)->standardLink)->id;
+                return (string) $id === (string) $classId;
+            })->values();
+        }
+
+        $classRank = $classes->mapWithKeys(function ($class) {
+            return [$class->StandardSection => sprintf('%03d-%s', optional($class->standard)->order ?? 99, optional($class->section)->name ?? '')];
+        });
+        $resultsByClass = collect($overview['rows'])->groupBy(function ($row) {
+            return $row['class'] ?: 'No class';
+        })->sortBy(function ($rows, $name) use ($classRank) {
+            return $classRank[$name] ?? '999-'.$name;
+        });
+        $studentsByClass = $students->groupBy(function ($student) {
+            return optional(optional($student->studentAcademicLatest)->standardLink)->StandardSection ?: 'No class';
+        })->sortBy(function ($rows, $name) use ($classRank) {
+            return $classRank[$name] ?? '999-'.$name;
+        });
+
+        return view('/admin/reports/reports', [
+            'students' => $students,
+            'teachers' => $teachers,
+            'overview' => $overview,
+            'classes' => $classes,
+            'classId' => $classId,
+            'resultsByClass' => $resultsByClass,
+            'studentsByClass' => $studentsByClass,
+        ]);
     }
     
     /**

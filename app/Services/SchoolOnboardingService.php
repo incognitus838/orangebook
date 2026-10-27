@@ -13,6 +13,7 @@ use App\Models\StandardLink;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Models\Userprofile;
+use App\Support\LevelPresets;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -27,6 +28,7 @@ class SchoolOnboardingService
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'slug' => $data['slug'] ?? Str::slug($data['school_name']),
+            'kind' => $data['kind'] ?? 'school',
             'status' => 1,
             'primary_color' => $data['primary_color'] ?? '#1B2A4A',
             'address' => $data['address'] ?? 'Nigeria',
@@ -39,7 +41,7 @@ class SchoolOnboardingService
             'usergroup_id' => User::SCHOOLADMIN_USERGROUP_ID,
             'name' => $data['admin_name'],
             'email' => $data['email'],
-            'mobile_no' => $data['phone'] ?? ('0803' . random_int(1000000, 9999999)),
+            'mobile_no' => $data['phone'] ?? null,
             'password' => Hash::make($data['password']),
             'status' => 'active',
             'email_verified' => true,
@@ -116,21 +118,25 @@ class SchoolOnboardingService
             ]
         );
 
+        $kind = $school->kind ?? 'school';
         if (!Standard::where('school_id', $school->id)->exists()) {
             $order = 1;
-            foreach (['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'] as $name) {
+            $levels = LevelPresets::levels($school);
+            $entry = LevelPresets::entryNames($school);
+            foreach ($levels as $name) {
                 Standard::create([
                     'school_id' => $school->id,
                     'name' => $name,
                     'slug' => Str::slug($name) . '-' . $school->id,
                     'order' => str_pad((string) $order++, 2, '0', STR_PAD_LEFT),
                     'status' => 1,
+                    'is_entry' => in_array($name, $entry, true),
                 ]);
             }
         }
 
         if (!Section::where('school_id', $school->id)->exists()) {
-            foreach (['A', 'B', 'Science', 'Arts', 'Commercial'] as $name) {
+            foreach (LevelPresets::arms($school) as $name) {
                 Section::create([
                     'school_id' => $school->id,
                     'name' => $name,
@@ -144,9 +150,12 @@ class SchoolOnboardingService
         $admin = User::where('school_id', $school->id)->where('usergroup_id', 3)->first();
 
         foreach ($standards as $standard) {
-            $isJss = str_starts_with($standard->name, 'JSS');
-            $arms = $isJss ? ['A', 'B'] : ['Science', 'Arts', 'Commercial'];
-            foreach ($arms as $arm) {
+            if ($kind === 'school') {
+                $armNames = str_starts_with($standard->name, 'JSS') ? ['A', 'B'] : ['Science', 'Arts', 'Commercial'];
+            } else {
+                $armNames = ['Morning'];
+            }
+            foreach ($armNames as $arm) {
                 $section = $sections->get($arm);
                 if (!$section) {
                     continue;

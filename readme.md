@@ -1,4 +1,6 @@
-# GegoK12
+# Orangebook
+
+School records for Nigerian classrooms. Forked from [GegoK12](https://github.com/Gego-K12/gegok12) (MIT). Upstream copyright remains with GegoSoft Technologies and GegoK12 Contributors.
 
 [![GitHub Forks](https://img.shields.io/github/forks/Gego-K12/gegok12?style=for-the-badge)](https://github.com/Gego-K12/gegok12/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/Gego-K12/gegok12?style=for-the-badge)](https://github.com/Gego-K12/gegok12/issues)

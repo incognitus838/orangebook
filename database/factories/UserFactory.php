@@ -51,7 +51,7 @@ class UserFactory extends Factory
 
         return [
             'name' => $first . ' ' . $last . ' ' . $uniqueId,
-            'email' => strtolower($first . $last . $uniqueId) . '@crest.ng',
+            'email' => strtolower($first . $last . $uniqueId) . '@orangebook.ng',
             'mobile_no' => '0803' . $this->faker->unique()->numerify('#######'),
             'password' => bcrypt('password'),
             'email_verification_code' => str_random(40),

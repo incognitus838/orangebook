@@ -54,7 +54,7 @@
                 list:[],
                 board:'',
                 standards:'',
-                boardlist:[ {id:'state_board' , name:'State Board'} , {id:'matric' , name:'Matriculation'} , {id:'cbse' , name:'CBSE'} , {id:'icse' , name:'ICSE'} , {id:'ib' , name:'IB'} ],
+                boardlist:[ {id:'waec' , name:'WAEC'} , {id:'neco' , name:'NECO'} , {id:'nerdc' , name:'NERDC'} , {id:'state_board' , name:'State Ministry'} , {id:'ib' , name:'IB'} ],
                 errors:[],
                 success:null,
             }

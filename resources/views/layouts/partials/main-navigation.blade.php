@@ -2,7 +2,7 @@
     <nav class="navbar sticky bg-white w-full flex  lg:flex-row px-4 lg:px-8 pt-4 mb-0 justify-between items-center shadow">
         <div>
             <a href="{{ url('/') }}" >
-                <img src="{{ asset('images/gego_k12.png') }}" class="inline-block mb-4" style="height:55px;" alt="GegoK12 Logo">
+                <a href="{{ url('/') }}" class="crest-wordmark" style="font-size:22px;">Orangebook</a>
             </a>
         </div>
 
@@ -35,7 +35,7 @@
 @if(request()->is('/'))
     <nav class="navbar bg-white w-full flex  lg:flex-row px-3 mt-4 mb-0 justify-between items-center home-navbar" ><!-- onscroll="checkscroll()" -->
         <!-- <div class="w-1/6 lg:w-1/6 md:w-1/6 pt-4">
-            <a class="text-sm lg:text-base px-3 py-1 rounded bg-white border hover:bg-gray-300 hover:text-gray-900 whitespace-no-wrap" href="https://gegosoft.com">{{ __('A Gegosoft Product') }}</a>
+            <a class="text-sm lg:text-base px-3 py-1 rounded bg-white border hover:bg-gray-300 hover:text-gray-900 whitespace-no-wrap" href="{{ url('/') }}">{{ __('Orangebook') }}</a>
         </div> -->
         <!-- <div class="w-4/6 lg:w-3/6 absolute lg:relative px-3 left-0 homemenu">
             <div class="hamburger-menu">
@@ -62,7 +62,7 @@
                                 </ul>
                             </div> 
                             <div class="py-4">  
-                                <h2 class="text-base font-semibold text-gray-500 px-4 py-2">Also From Gegok12</h2>
+                                <h2 class="text-base font-semibold text-gray-500 px-4 py-2">Also from Orangebook</h2>
                                 <ul class="leading-loose text-gray-700 font-semibold pt-3 text-sm">
                                     <li class="px-4 py-2 hover:bg-gray-100"><a class="menu__item" href="#">About us</a></li>
                                     <li class="px-4 py-2 hover:bg-gray-100"><a class="menu__item" href="#">News</a></li>
@@ -71,7 +71,7 @@
                                 </ul>
                             </div>
                             <div class="py-4">
-                                <h2 class="text-base font-semibold text-gray-500 px-4 py-2">About Gegok12</h2>
+                                <h2 class="text-base font-semibold text-gray-500 px-4 py-2">About Orangebook</h2>
                                 <ul class="leading-loose text-gray-700 font-semibold pt-3 text-sm">
                                     <li class="px-4 py-2 hover:bg-gray-100"><a class="menu__item" href="#">About us</a></li>
                                     <li class="px-4 py-2 hover:bg-gray-100"><a class="menu__item" href="#">News</a></li>

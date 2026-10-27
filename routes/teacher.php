@@ -7,13 +7,25 @@ Route::get('/class', 'ClassRoomController@index');
 Route::get('/class/{id}', 'ClassRoomController@show');
 Route::post('/class/{id}/attendance', 'ClassRoomController@storeAttendance');
 Route::post('/class/{id}/remarks/{student}', 'ClassRoomController@storeRemark');
+Route::post('/class/{id}/homework', 'ClassRoomController@storeHomework');
+Route::get('/results', 'ResultsController@index');
 Route::get('/class/{id}/results', 'ResultsController@show');
 Route::post('/class/{id}/results', 'ResultsController@store');
 Route::post('/class/{id}/results/publish', 'ResultsController@publish');
-Route::get('/mail', 'CircularController@create');
-Route::post('/mail', 'CircularController@store');
-Route::get('/mail/log', 'CircularController@log');
+Route::get('/class/{id}/results/{student}/pdf', 'ResultsController@pdf');
+Route::get('/mail', fn () => redirect('/teacher/announcements'));
+Route::post('/mail', 'AnnouncementController@store');
+Route::get('/mail/log', fn () => redirect('/teacher/announcements'));
 Route::get('/mail/count', 'CircularController@count');
+Route::get('/announcements', 'AnnouncementController@index');
+Route::post('/announcements', 'AnnouncementController@store');
+Route::post('/announcements/{id}/archive', 'AnnouncementController@archive')->whereNumber('id');
+Route::post('/announcements/{id}', 'AnnouncementController@update')->whereNumber('id');
+Route::delete('/announcements/{id}', 'AnnouncementController@destroy')->whereNumber('id');
+Route::get('/homeworks', 'HomeworkBoardController@index');
+Route::post('/homeworks', 'HomeworkBoardController@store');
+Route::post('/events', 'EventsController@storeDate');
+Route::post('/notices', 'NoticeBoardController@storeNotice');
 Route::get( '/dashboard/timetable', 'DashboardController@timetable' );
 Route::get( '/dashboard/tasklist/{task_flag}','DashboardController@list' );
 Route::get( '/dashboard/task/count','DashboardController@listCount' );
@@ -136,6 +148,9 @@ Route::get('/holidays','HolidaysController@index');
 
 Route::get( '/changepassword', 'UserProfileController@ChangePassword' );
 Route::post( '/changepassword', 'UserProfileController@updateChangePassword' );
+
+Route::get( '/editprofile', 'UserProfileController@edit' );
+Route::post( '/editprofile', 'UserProfileController@updateProfile' );
 
 Route::get( '/changeavatar', 'UserProfileController@changeavatar' );
 Route::post( '/changeavatar', 'UserProfileController@updatechangeavatar' );
@@ -428,7 +443,7 @@ Route::group(['middleware' => ['role:student_leave_checker']], function () {
 //noticeboard
     //index
     Route::get( '/notice/show/list', 'NoticeBoardController@list' );
-    Route::get( '/notices', 'NoticeBoardController@index' );
+    Route::get( '/notices', fn () => redirect('/teacher/announcements') );
 
 //Feed
 Route::get('/feeds', 'FeedController@index');

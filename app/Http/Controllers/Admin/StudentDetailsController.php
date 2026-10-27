@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentParentLink;
 use App\Models\StudentAcademic;
+use App\Models\Userprofile;
 use Illuminate\Http\Request;
 use App\Schoolplus\StudentFacade as Student;
 use App\Helpers\SiteHelper;
@@ -328,28 +329,137 @@ class StudentDetailsController extends Controller
      * @param string $name Student name
      * @return \Illuminate\View\View
      */
+    public function showById($id)
+    {
+        $user = User::with(['studentAcademicLatest.standardLink.standard', 'studentAcademicLatest.standardLink.section'])
+            ->where('id', $id)
+            ->where('school_id', Auth::user()->school_id)
+            ->where('usergroup_id', User::STUDENT_USERGROUP_ID)
+            ->firstOrFail();
+
+        return $this->renderShow($user);
+    }
+
     public function show($name)
     {
-        // 
-        $user = User::with('studentAcademicLatest')->where('name',$name)->first(); 
-        $parents = $user->parent;
+        $user = User::with(['studentAcademicLatest.standardLink.standard', 'studentAcademicLatest.standardLink.section'])
+            ->where('name', $name)
+            ->where('school_id', Auth::user()->school_id)
+            ->first();
+        if ($user) {
+            return redirect('/admin/students/'.$user->id);
+        }
+        abort(404);
+    }
+
+    protected function renderShow(User $user)
+    { 
+        $parentIds = StudentParentLink::where('student_id', $user->id)->pluck('parent_id');
+        $parents = User::where('school_id', Auth::user()->school_id)
+            ->where('usergroup_id', User::PARENT_USERGROUP_ID)
+            ->whereIn('id', $parentIds)
+            ->orderBy('name')
+            ->get();
         if(Gate::allows('member',$user))
         {
-            if($_SERVER['HTTP_REFERER'] != null)
-            {
-                $prev_url = $_SERVER['HTTP_REFERER'];
-            }
-            else
-            {
-                $prev_url = url('/admin/students');
-            }
-            
-            return view('/admin/member/show',['user' => $user , 'parents' => $parents , 'prev_url' => $prev_url]);
+            $year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+            $classes = $year
+                ? StandardLink::with('standard', 'section')->where('school_id', Auth::user()->school_id)->where('academic_year_id', $year->id)->get()
+                : collect();
+            $enrollments = $year
+                ? StudentAcademic::with('standardLink.standard', 'standardLink.section')
+                    ->where('user_id', $user->id)
+                    ->where('academic_year_id', $year->id)
+                    ->get()
+                : collect();
+            return view('/admin/member/show',['user' => $user , 'parents' => $parents , 'classes' => $classes, 'enrollments' => $enrollments]);
         }
         else
         {
             abort(403);
         } 
+    }
+
+    public function updateById(Request $request, $id)
+    {
+        $user = User::where('id', $id)->where('school_id', Auth::user()->school_id)->where('usergroup_id', User::STUDENT_USERGROUP_ID)->firstOrFail();
+
+        return $this->saveSimple($request, $user);
+    }
+
+    public function updateSimple(Request $request, $name)
+    {
+        $user = User::where('name', $name)->where('school_id', Auth::user()->school_id)->firstOrFail();
+
+        return $this->saveSimple($request, $user);
+    }
+
+    protected function saveSimple(Request $request, User $user)
+    {
+        if (!Gate::allows('member', $user)) {
+            abort(403);
+        }
+        $data = $request->validate([
+            'name' => 'required|string|max:80',
+            'class_id' => 'required|integer',
+            'add_class_id' => 'nullable|integer',
+            'email' => 'nullable|email|max:120|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+            'admission_no' => 'nullable|string|max:40',
+        ]);
+        $year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+        $class = StandardLink::where('id', $data['class_id'])->where('school_id', Auth::user()->school_id)->firstOrFail();
+        $admission = \App\Support\AdmissionNumber::normalize($data['admission_no'] ?? $user->registration_number);
+        if ($admission && User::where('school_id', $user->school_id)->where('registration_number', $admission)->where('id', '!=', $user->id)->exists()) {
+            return back()->with('failmessage', 'That admission number is already in use.')->withInput();
+        }
+        $user->name = $data['name'];
+        $user->email = $data['email'] ?: null;
+        $user->mobile_no = $data['phone'] ?: null;
+        if ($admission) {
+            $user->registration_number = $admission;
+        }
+        $user->save();
+        $parts = preg_split('/\s+/', trim($data['name']), 2);
+        $profile = Userprofile::where('user_id', $user->id)->first();
+        if ($profile) {
+            $profile->firstname = $parts[0];
+            $profile->lastname = $parts[1] ?? $profile->lastname;
+            if ($admission) {
+                $profile->registration_number = $admission;
+            }
+            $profile->save();
+        }
+        $academic = $user->studentAcademicLatest;
+        if ($academic) {
+            $academic->standardLink_id = $class->id;
+            $academic->save();
+        } else {
+            StudentAcademic::create([
+                'school_id' => $user->school_id,
+                'academic_year_id' => $year->id,
+                'user_id' => $user->id,
+                'standardLink_id' => $class->id,
+                'roll_number' => $admission ?: (string) $user->id,
+            ]);
+        }
+        if (! empty($data['add_class_id']) && ($user->school->kind ?? '') === 'training') {
+            $extra = StandardLink::where('id', $data['add_class_id'])->where('school_id', $user->school_id)->firstOrFail();
+            $already = StudentAcademic::where('user_id', $user->id)
+                ->where('academic_year_id', $year->id)
+                ->where('standardLink_id', $extra->id)
+                ->exists();
+            if (! $already) {
+                StudentAcademic::create([
+                    'school_id' => $user->school_id,
+                    'academic_year_id' => $year->id,
+                    'user_id' => $user->id,
+                    'standardLink_id' => $extra->id,
+                    'roll_number' => $admission ?: (string) $user->id,
+                ]);
+            }
+        }
+        return redirect('/admin/students/'.$user->id)->with('successmessage', $user->name.' saved.');
     }
 
     /**

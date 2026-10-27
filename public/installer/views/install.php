@@ -13,7 +13,7 @@ $allToolsAvailable = $tools['composer']['available'] && $tools['php']['available
             </svg>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">Ready to Install</h2>
-        <p class="text-gray-600">We'll now install and configure your Gego K12 system</p>
+        <p class="text-gray-600">We'll now install and configure Orangebook on this server.</p>
     </div>
 
     <!-- Installation Summary -->

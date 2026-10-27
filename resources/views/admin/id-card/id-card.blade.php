@@ -12,7 +12,7 @@
   </table>
   <div style="margin-top: 10px;width: 88%;margin-left: auto;">
      <h3 style="margin-bottom: unset;text-stroke-width:0.5px;text-stroke-color:#fff;font-size: 25px;color: #be123c;font-weight:800;text-align: center;">DEVASAKAYAM</h3>
-     <h6 style="font-weight: 700;font-size: 15px;color: #166534;text-align: center;margin-bottom: unset;">Crest Secondary School, Ikeja, Lagos</h6>
+     <h6 style="font-weight: 700;font-size: 15px;color: #166534;text-align: center;margin-bottom: unset;">{{ optional(Auth::user()->school)->name ?? config('app.name') }}, Lagos</h6>
   </div>
 <table style="width: 100%;">
   <tbody>

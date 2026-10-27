@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call(UsergroupTableSeeder::class);
         $this->call(CountriesTableSeeder::class);
+        $this->call(NigerianLocationsSeeder::class);
         $this->call(StatesTableSeeder::class);
         $this->call(CitiesTableSeeder::class);
         $this->call(PlansTableSeeder::class);
@@ -70,5 +71,6 @@ class DatabaseSeeder extends Seeder
         // $this->call(PayrollSeeder::class);
         $this->call(TagSeeder::class);
         $this->call(CrestSaaSSeeder::class);
+        $this->call(IkejaDeskSeeder::class);
     }
 }

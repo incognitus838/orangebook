@@ -51,7 +51,7 @@ class Subject extends Model
      */
 	protected $fillable = [
 
-	    'school_id' , 'academic_year_id' , 'standard_id' , 'section_id' , 'name' , 'code' , 'type'
+	    'school_id' , 'academic_year_id' , 'standard_id' , 'section_id' , 'name' , 'code' , 'type', 'status'
 	];
 
     /**

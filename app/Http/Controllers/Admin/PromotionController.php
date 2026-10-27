@@ -134,8 +134,37 @@ class PromotionController extends Controller
      */
     public function create()
     {
-        //
-        return view('/admin/promotion/create');
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $classes = $year
+            ? StandardLink::with('standard', 'section')->where('school_id', $schoolId)->where('academic_year_id', $year->id)->get()
+            : collect();
+        $counts = $classes->isEmpty()
+            ? collect()
+            : StudentAcademic::whereIn('standardLink_id', $classes->pluck('id'))
+                ->selectRaw('standardLink_id, count(*) as n')
+                ->groupBy('standardLink_id')
+                ->pluck('n', 'standardLink_id');
+        return view('/admin/promotion/create', ['classes' => $classes, 'year' => $year, 'counts' => $counts]);
+    }
+
+    public function promote(Request $request)
+    {
+        $data = $request->validate([
+            'from_class_id' => 'required|integer|different:to_class_id',
+            'to_class_id' => 'required|integer',
+            'confirm' => 'accepted',
+        ]);
+        $schoolId = Auth::user()->school_id;
+        $from = StandardLink::where('id', $data['from_class_id'])->where('school_id', $schoolId)->firstOrFail();
+        $to = StandardLink::where('id', $data['to_class_id'])->where('school_id', $schoolId)->firstOrFail();
+        $moved = StudentAcademic::where('school_id', $schoolId)
+            ->where('standardLink_id', $from->id)
+            ->update([
+                'standardLink_id' => $to->id,
+                'academic_year_id' => $to->academic_year_id,
+            ]);
+        return redirect('/admin/promotions')->with('successmessage', $moved.' student'.($moved === 1 ? '' : 's').' moved from '.$from->StandardSection.' to '.$to->StandardSection.'.');
     }
 
     /**

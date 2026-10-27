@@ -1,64 +1,33 @@
-@extends('layouts.empty')
+@extends('layouts.marketing')
+
+@section('title', 'Choose a new password. Orangebook')
 
 @section('content')
-<div class="container mx-auto flex relative ">
-
-            <div class="w-full lg:w-1/3 mx-auto bg-white shadow border border-grey p-5">
-                <div class="">
-                    <h1 class="font-heading mb-3">{{ __('Reset Password') }}</h1>
-                </div>
-
-                <div class="">
-                    <form method="POST" action="{{url('/password/reset/')}}" aria-label="{{ __('Reset Password') }}">
-                        @csrf
-
-                        <input type="hidden" name="token" value="{{ $token }}">
-
-                        <div class="form-group row">
-                            <label for="email" class="tw-form-label">{{ __('E-Mail Address') }}</label>
-
-                            <div class="my-2">
-                                <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }} tw-form-control w-full" name="email" value="{{ $email ?? old('email') }}" required autofocus>
-
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback text-xs text-red-600" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="tw-form-label">{{ __('Password') }}</label>
-
-                            <div class="my-2">
-                                <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }} tw-form-control w-full" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="invalid-feedback text-xs text-red-600" role="alert">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password-confirm" class="tw-form-label">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="tw-form-control w-full" name="password_confirmation" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mt-4">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary submit-btn">
-                                    {{ __('Reset Password') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="crest-split">
+    <aside class="crest-split-ink">
+        <h1>Choose a new password.</h1>
+        <p>At least 8 characters. You will use it with your email the next time you log in.</p>
+    </aside>
+    <div class="crest-split-form">
+        <h2>New password</h2>
+        <form method="POST" action="{{ url('/password/reset/') }}" class="crest-form" aria-label="Reset password">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" value="{{ $email ?? old('email') }}" required autofocus autocomplete="email">
+            @if ($errors->has('email'))
+                <p class="crest-err" role="alert">{{ $errors->first('email') }}</p>
+            @endif
+            <label for="password">New password</label>
+            <input id="password" type="password" name="password" required autocomplete="new-password">
+            @if ($errors->has('password'))
+                <p class="crest-err" role="alert">{{ $errors->first('password') }}</p>
+            @endif
+            <label for="password-confirm">Confirm new password</label>
+            <input id="password-confirm" type="password" name="password_confirmation" required autocomplete="new-password">
+            <button type="submit" class="crest-btn">Save password</button>
+        </form>
+        <p class="ob-auth-foot"><a href="{{ route('login') }}">Back to log in</a></p>
+    </div>
+</div>
 @endsection

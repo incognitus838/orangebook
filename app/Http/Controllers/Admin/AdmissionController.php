@@ -46,7 +46,74 @@ class AdmissionController extends Controller
      */
     public function index( Request $request ) 
     {
-        return view('/admin/admission/index');
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $classes = $year
+            ? StandardLink::with('standard', 'section')->where('school_id', $schoolId)->where('academic_year_id', $year->id)->get()
+            : collect();
+        $admissions = Admission::where('school_id', $schoolId)
+            ->when($year, fn ($q) => $q->where('academic_year_id', $year->id))
+            ->orderByDesc('id')
+            ->get();
+        return view('/admin/admission/index', [
+            'admissions' => $admissions,
+            'classes' => $classes,
+        ]);
+    }
+
+    public function storeSimple(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:80',
+            'class_id' => 'required|integer',
+            'email' => 'nullable|email|max:120',
+            'phone' => 'nullable|string|max:20',
+        ]);
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $class = StandardLink::where('id', $data['class_id'])->where('school_id', $schoolId)->firstOrFail();
+        Admission::create([
+            'school_id' => $schoolId,
+            'academic_year_id' => $year->id,
+            'standard_id' => $class->standard_id,
+            'section_id' => $class->section_id,
+            'name' => $data['name'],
+            'date_of_birth' => now()->subYears(12)->toDateString(),
+            'gender' => 'male',
+            'height' => '-',
+            'weight' => '-',
+            'reason_for_leaving' => '-',
+            'permanent_address' => '-',
+            'address_for_communication' => '-',
+            'half_yearly_mark_details' => '-',
+            'father_name' => '-',
+            'father_occupation' => '-',
+            'father_mobile_no' => $data['phone'] ?: '-',
+            'mother_name' => '-',
+            'emergency_contact_1' => $data['phone'] ?: '-',
+            'relation_with_student_1' => 'parent',
+            'emergency_contact_2' => '-',
+            'relation_with_student_2' => '-',
+            'application_no' => 'A'.now()->format('ymd').random_int(10, 99),
+            'application_status' => 'Pending',
+            'payment_status' => 'unpaid',
+            'remarks' => $data['email'] ?: '-',
+        ]);
+        return redirect('/admin/admissions')->with('successmessage', $data['name'].' is on the admissions list for '.$class->StandardSection.'.');
+    }
+
+    public function approveSimple($id)
+    {
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $admission = Admission::where('id', $id)->where('school_id', $schoolId)->firstOrFail();
+        $class = StandardLink::where('school_id', $schoolId)
+            ->where('standard_id', $admission->standard_id)
+            ->when($admission->section_id, fn ($q) => $q->where('section_id', $admission->section_id))
+            ->first();
+        $admission->application_status = 'Approved';
+        $admission->save();
+        return redirect('/admin/students/intake')->with('successmessage', $admission->name.' is approved. They appear on the new-intake list.');
     }
 
     /**

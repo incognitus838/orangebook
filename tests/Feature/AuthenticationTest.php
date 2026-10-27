@@ -93,7 +93,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         // Assert successful login
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/library/dashboard');
         $this->assertAuthenticatedAs($librarian);
     }
 
@@ -121,7 +121,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         // Assert successful login
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/student/dashboard');
         $this->assertAuthenticatedAs($student);
     }
 
@@ -149,7 +149,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         // Assert successful login
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/teacher/dashboard');
         $this->assertAuthenticatedAs($teacher);
     }
 

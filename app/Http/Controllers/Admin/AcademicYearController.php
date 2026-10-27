@@ -15,12 +15,14 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\AcademicTerm;
 use App\Models\AcademicYear;
 use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
 use App\Traits\Common;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Str;
 use Log;
 
 /**
@@ -62,10 +64,102 @@ class AcademicYearController extends Controller
      */
     public function index()
     {
-        //
-        $academicYears = AcademicYear::where('school_id', Auth::user()->school_id)->get();
+        $schoolId = Auth::user()->school_id;
+        $academicYears = AcademicYear::where('school_id', $schoolId)->orderByDesc('start_date')->get();
+        $currentYear = $academicYears->firstWhere('status', 1) ?: SiteHelper::getAcademicYear($schoolId);
+        $terms = collect();
+        if ($currentYear) {
+            $this->ensureTerms($schoolId, $currentYear);
+            $terms = AcademicTerm::where('school_id', $schoolId)
+                ->where('academic_year_id', $currentYear->id)
+                ->orderBy('term_order')
+                ->get();
+        }
+        return view('/admin/school/academics/index', [
+            'school' => Auth::user()->school,
+            'academicYears' => $academicYears,
+            'currentYear' => $currentYear,
+            'terms' => $terms,
+        ]);
+    }
 
-        return view('/admin/school/academics/index', ['school' => $school, 'academicYears' => $academicYears]);
+    public function storeYear(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:40',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'status' => 'required|in:0,1,2',
+        ]);
+        $schoolId = Auth::user()->school_id;
+        if ((int) $data['status'] === 1) {
+            AcademicYear::where('school_id', $schoolId)->where('status', 1)->update(['status' => 0]);
+        }
+        $year = AcademicYear::create([
+            'school_id' => $schoolId,
+            'name' => $data['name'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'status' => (int) $data['status'],
+        ]);
+        $this->ensureTerms($schoolId, $year);
+        return redirect('/admin/academics')->with('successmessage', $data['name'].' is on the roll.');
+    }
+
+    public function makeCurrent($id)
+    {
+        $schoolId = Auth::user()->school_id;
+        $year = AcademicYear::where('id', $id)->where('school_id', $schoolId)->firstOrFail();
+        AcademicYear::where('school_id', $schoolId)->where('status', 1)->update(['status' => 0]);
+        $year->status = 1;
+        $year->save();
+        $this->ensureTerms($schoolId, $year);
+        return redirect('/admin/academics')->with('successmessage', $year->name.' is the current year.');
+    }
+
+    public function makeTermCurrent($id)
+    {
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $term = AcademicTerm::where('id', $id)
+            ->where('school_id', $schoolId)
+            ->where('academic_year_id', $year->id)
+            ->firstOrFail();
+        AcademicTerm::where('school_id', $schoolId)
+            ->where('academic_year_id', $year->id)
+            ->update(['is_current' => false]);
+        $term->is_current = true;
+        $term->save();
+        return redirect('/admin/academics')->with('successmessage', $term->name.' is the current term.');
+    }
+
+    private function ensureTerms(int $schoolId, AcademicYear $year): void
+    {
+        $names = [1 => 'First Term', 2 => 'Second Term', 3 => 'Third Term'];
+        foreach ($names as $order => $name) {
+            AcademicTerm::firstOrCreate(
+                [
+                    'school_id' => $schoolId,
+                    'academic_year_id' => $year->id,
+                    'term_order' => $order,
+                ],
+                [
+                    'name' => $name,
+                    'slug' => Str::slug($name),
+                    'is_current' => $order === 1,
+                ]
+            );
+        }
+        $hasCurrent = AcademicTerm::where('school_id', $schoolId)
+            ->where('academic_year_id', $year->id)
+            ->where('is_current', true)
+            ->exists();
+        if (!$hasCurrent) {
+            AcademicTerm::where('school_id', $schoolId)
+                ->where('academic_year_id', $year->id)
+                ->where('term_order', 1)
+                ->update(['is_current' => true]);
+        }
     }
 
     /**

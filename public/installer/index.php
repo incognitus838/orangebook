@@ -1,6 +1,6 @@
 <?php
 /**
- * Gego K12 - Visual Installation Wizard
+ * Orangebook installation wizard
  *
  * A standalone PHP installer that works without Laravel
  * Handles: Requirements check, Database setup, Primary configuration

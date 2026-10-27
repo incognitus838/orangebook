@@ -49,7 +49,7 @@ class NoticeBoard extends Model
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'academic_year_id' , 'standardLink_id' , 'type' ,'title', 'publish_date', 'expire_date','description','attachment_file', 'status'
+        'school_id' , 'academic_year_id' , 'standardLink_id' , 'type' ,'title', 'publish_date', 'expire_date','description','attachment_file', 'status', 'audience', 'send_mail_id', 'full_body', 'created_by'
     ];
 
     /**
@@ -62,6 +62,7 @@ class NoticeBoard extends Model
     protected $casts = [
         'publish_date' => 'datetime',
         'expire_date' => 'datetime',
+        'audience' => 'array',
     ];
 
     /**
@@ -102,6 +103,16 @@ class NoticeBoard extends Model
     public function standardLink()
     {
     	return $this->belongsTo('\App\Models\StandardLink','standardLink_id');
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function sendMail()
+    {
+        return $this->belongsTo(SendMail::class, 'send_mail_id');
     }
 
     /**

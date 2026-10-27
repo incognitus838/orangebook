@@ -1,11 +1,12 @@
-@extends('errors::illustrated-layout')
+@extends('layouts.marketing')
 
-@section('code', '404')
-@section('title', __('Page Not Found'))
+@section('title', 'Page not found. Orangebook')
+@section('meta', 'That page is not in Orangebook.')
 
-@section('image')
-    <div style="background-image: url({{ asset('/svg/404.svg') }});" class="absolute pin bg-cover bg-no-repeat md:bg-left lg:bg-center">
-    </div>
+@section('content')
+<article class="lp-legal">
+    <h1>This page is not here.</h1>
+    <p>The address does not match a page in Orangebook. Open the homepage, or apply for a quote.</p>
+    <p><a class="lp-btn" href="{{ url('/') }}">Orangebook home</a></p>
+</article>
 @endsection
-
-@section('message', __('Sorry, the page you are looking for could not be found.'))

@@ -87,11 +87,42 @@ class NoticeBoardController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
-    { 
-        $query = \Request::getQueryString();
+    public function index(\App\Services\SchoolBoardService $board)
+    {
+        $classes = $board->teacherClasses(Auth::user());
+        $schoolId = Auth::user()->school_id;
+        return view('crest.board.notices', [
+            'layout' => 'layouts.admin.layout',
+            'notices' => $board->notices($schoolId),
+            'classes' => $classes,
+            'people' => \App\Models\User::where('school_id', $schoolId)->where('status', 'active')->orderBy('name')->get(['id', 'name', 'email']),
+            'groups' => \App\Models\PeopleGroup::where('school_id', $schoolId)->orderBy('name')->get(),
+            'fullTarget' => true,
+            'action' => url('/admin/notices'),
+            'canAdd' => true,
+        ]);
+    }
 
-        return view('/admin/noticeboard/index' ,['query' => $query]);
+    public function storeNotice(\Illuminate\Http\Request $request, \App\Services\SchoolBoardService $board, \App\Services\RecipientService $recipients)
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:120',
+            'body' => 'required|string|max:240',
+            'everyone' => 'nullable',
+            'groups' => 'nullable|array',
+            'group_ids' => 'nullable|array',
+            'class_id' => 'nullable|integer',
+            'class_who' => 'nullable|string',
+            'user_ids' => 'nullable|array',
+        ]);
+        $payload = $recipients->payloadFromRequest($request);
+        $people = $recipients->fromRequest($request, Auth::user()->school_id);
+        if ($people->isEmpty() && empty($payload['everyone'])) {
+            return back()->with('failmessage', 'Choose who should see this notice.')->withInput();
+        }
+        $data['audience'] = $payload;
+        $board->addNotice(Auth::user(), $data);
+        return redirect('/admin/notices')->with('successmessage', 'Notice posted.');
     }
     /**
      * Get standard links and background images.

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Parent;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Parent\Concerns\FindsChildren;
 use App\Models\Notes;
+use App\Models\SendMail;
 use App\Services\ResultsService;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,5 +39,16 @@ class DashboardController extends Controller
             'parent' => Auth::user(),
             'cards' => $cards,
         ]);
+    }
+
+    public function circulars()
+    {
+        $rows = SendMail::where('school_id', Auth::user()->school_id)
+            ->where('to', Auth::user()->email)
+            ->orderByDesc('id')
+            ->take(40)
+            ->get();
+        $notices = app(\App\Services\SchoolBoardService::class)->noticesForViewer(Auth::user());
+        return view('parent.circulars', ['rows' => $rows, 'notices' => $notices]);
     }
 }

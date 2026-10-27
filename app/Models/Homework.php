@@ -72,6 +72,7 @@ class Homework extends Model
 
     protected $casts = [
         'date' => 'datetime',
+        'submission_date' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 

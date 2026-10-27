@@ -71,12 +71,50 @@ class HomeworkController extends Controller
 
     public function index()
     {
-        //
-        $query = \Request::getQueryString();
+        $user = Auth::user();
+        $classId = optional($user->studentAcademicLatest)->standardLink_id;
+        $works = collect();
+        $doneIds = collect();
+        if ($classId) {
+            $works = Homework::with('subject')
+                ->where('school_id', $user->school_id)
+                ->where('standardLink_id', $classId)
+                ->where('status', 'publish')
+                ->orderByDesc('id')
+                ->get();
+            $doneIds = StudentHomework::where('user_id', $user->id)
+                ->whereIn('homework_id', $works->pluck('id'))
+                ->pluck('homework_id');
+        }
 
-        $standardLink_id = Auth()->user()->studentAcademicLatest->standardLink_id;
+        return view('student.homework.list', [
+            'works' => $works,
+            'doneIds' => $doneIds,
+        ]);
+    }
 
-        return view('/student/homework/index' , ['query' => $query , 'standardLink_id' => $standardLink_id]);
+    public function done($id)
+    {
+        $user = Auth::user();
+        $classId = optional($user->studentAcademicLatest)->standardLink_id;
+        $work = Homework::where('id', $id)
+            ->where('school_id', $user->school_id)
+            ->where('standardLink_id', $classId)
+            ->firstOrFail();
+
+        StudentHomework::updateOrCreate(
+            [
+                'homework_id' => $work->id,
+                'user_id' => $user->id,
+            ],
+            [
+                'attachment' => null,
+                'submitted_on' => now()->toDateString(),
+                'status' => 'unchecked',
+            ]
+        );
+
+        return redirect('/student/homeworks')->with('successmessage', 'Marked done.');
     }
 
     /**

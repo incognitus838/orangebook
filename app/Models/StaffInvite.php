@@ -11,7 +11,10 @@ class StaffInvite extends Model
         'invited_by',
         'name',
         'email',
+        'phone',
         'usergroup_id',
+        'class_id',
+        'subjects',
         'token',
         'expires_at',
         'accepted_at',
@@ -20,6 +23,7 @@ class StaffInvite extends Model
     protected $casts = [
         'expires_at' => 'datetime',
         'accepted_at' => 'datetime',
+        'subjects' => 'array',
     ];
 
     public function school()

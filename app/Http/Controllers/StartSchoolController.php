@@ -2,40 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Plan;
-use App\Services\SchoolOnboardingService;
+use App\Models\SchoolApplication;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class StartSchoolController extends Controller
 {
-    public function create(Request $request)
+    public function create()
     {
-        $plans = Plan::where('is_active', 1)->orderBy('order')->get();
-        $selected = $request->query('plan', 'trial');
-        return view('marketing.start', compact('plans', 'selected'));
+        return view('marketing.start');
     }
 
-    public function store(Request $request, SchoolOnboardingService $onboarding)
+    public function store(Request $request)
     {
         $data = $request->validate([
-            'school_name' => 'required|string|max:120|unique:schools,name',
+            'school_name' => 'required|string|max:120',
             'admin_name' => 'required|string|max:80',
-            'email' => 'required|email|unique:users,email|unique:schools,email',
-            'phone' => 'nullable|string|max:20|unique:schools,phone',
-            'password' => 'required|string|min:6',
-            'plan' => 'nullable|string',
+            'email' => 'required|email|max:120',
+            'phone' => 'nullable|string|max:20',
+            'kind' => 'required|in:school,ngo,training',
+            'student_count' => 'required|integer|min:1|max:100000',
+            'notes' => 'nullable|string|max:2000',
         ]);
 
-        $plan = Plan::where('name', $data['plan'] ?? 'trial')->first();
-        $data['slug'] = Str::slug($data['school_name']);
-        $data['phone'] = $data['phone'] ?: ('0803' . random_int(1000000, 9999999));
+        SchoolApplication::create($data + ['status' => 'pending']);
 
-        $admin = $onboarding->createSchool($data, $plan);
-        Auth::login($admin);
-
-        return redirect('/admin/crest/billing')
-            ->with('successmessage', 'Your school is live on a ' . ($plan->display_name ?? 'trial') . ' plan.');
+        return redirect('/start')->with('applied_email', $data['email']);
     }
 }

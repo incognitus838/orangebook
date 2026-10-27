@@ -141,10 +141,44 @@ class TeacherShowController extends Controller
    */
   public function show($name)
   {
-    //
-    $user = User::where('name', $name)->first();
+    $user = User::where('name', $name)
+        ->where('school_id', Auth::user()->school_id)
+        ->with(['standardLink.standard', 'standardLink.section', 'teacherlink.subject', 'teacherlink.standardLink.standard', 'teacherlink.standardLink.section'])
+        ->firstOrFail();
+    $year = SiteHelper::getAcademicYear(Auth::user()->school_id);
+    $classes = $year
+        ? \App\Models\StandardLink::with('standard', 'section')->where('school_id', Auth::user()->school_id)->where('academic_year_id', $year->id)->get()
+        : collect();
 
-    return view('/admin/teacher/show', ['user' => $user]);
+    return view('/admin/teacher/show', ['user' => $user, 'classes' => $classes]);
+  }
+
+  public function updateSimple(Request $request, $name)
+  {
+    $user = User::where('name', $name)->where('school_id', Auth::user()->school_id)->firstOrFail();
+    $data = $request->validate([
+        'name' => 'required|string|max:80|unique:users,name,'.$user->id,
+        'class_id' => 'nullable|integer',
+        'email' => 'required|email|max:120|unique:users,email,'.$user->id,
+        'phone' => 'nullable|string|max:20',
+    ]);
+    $user->name = $data['name'];
+    $user->email = $data['email'];
+    $user->mobile_no = $data['phone'] ?: $user->mobile_no;
+    $user->save();
+    $parts = preg_split('/\s+/', trim($data['name']), 2);
+    $profile = \App\Models\Userprofile::where('user_id', $user->id)->first();
+    if ($profile) {
+        $profile->firstname = $parts[0];
+        $profile->lastname = $parts[1] ?? $profile->lastname;
+        $profile->save();
+    }
+    if (!empty($data['class_id'])) {
+        $class = \App\Models\StandardLink::where('id', $data['class_id'])->where('school_id', Auth::user()->school_id)->firstOrFail();
+        $class->class_teacher_id = $user->id;
+        $class->save();
+    }
+    return redirect('/admin/teacher/show/'.rawurlencode($user->name))->with('successmessage', $user->name.' saved.');
   }
 
   public function showidcard($name)

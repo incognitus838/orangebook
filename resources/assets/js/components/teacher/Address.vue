@@ -105,7 +105,7 @@
 	      	user:[],
 	      	city_id:'',
 	      	state_id:'',
-	      	country_id:7,
+	      	country_id:10,
 	      	pincode:'',
 	      	countrylist:[],
 	      	statelist:[],

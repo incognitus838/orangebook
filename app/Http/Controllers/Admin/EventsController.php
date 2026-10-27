@@ -61,48 +61,29 @@ class EventsController extends Controller
      * @param Request $request
      * @return \Illuminate\View\View
      */
-    function index(Request $request)
+    function index(\App\Services\SchoolBoardService $board)
     {
-        //
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   SiteHelper::getAcademicYear($school_id);
-        $events         =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id]]); //,['status','active']
-        $count          =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->count(); //,['status','active']
-        $subscription   =   Subscription::where('school_id',$school_id)->first();
+        return view('crest.board.calendar', [
+            'layout' => 'layouts.admin.layout',
+            'events' => $board->events(Auth::user()->school_id),
+            'action' => url('/admin/events'),
+            'canAdd' => true,
+        ]);
+    }
 
-        if(count((array)\Request::getQueryString())>0)
-        {
-            if($request->standardLink_id != '')
-            { 
-                $events = $events->where('standard_id',$request->standardLink_id);
-            }
-        }
-
-        //new 
-        if(!config('gexam.enabled', false))
-        {
-            $events =$events->where('category','!=','exam');
-        }
-
-        $events = $events->get();
-
-        $events = $events->map(function( $event, $key) {
-            $eventData = [ 
-                'id'        =>  $event->id,
-                'title'     =>  $event->title, 
-                'start'     =>  date('Y-m-d', strtotime($event->start_date)).'T'.date('H:i:s', strtotime($event->start_date)),
-                'end'       =>  date('Y-m-d', strtotime($event->end_date)).'T'.date('H:i:s', strtotime($event->end_date)),
-                'allDay'    =>  $event->allDay,
-                'select_type'=>$event->select_type,
-                'color'=>$event->color,
-            ];
-            return $eventData;
-        });
-        $events = json_encode($events);
-
-        $standard=$request->standardLink_id;
-       
-        return view('admin.events.index',['events'=>$events , 'count'=>$count , 'subscription'=>$subscription,'standard'=>$standard]);
+    public function storeDate(Request $request, \App\Services\SchoolBoardService $board)
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'title' => 'required|string|max:120',
+            'notes' => 'nullable|string|max:500',
+        ]);
+        $board->addEvent(Auth::user(), $data);
+        $qs = http_build_query(array_filter([
+            'view' => $request->input('view', 'month'),
+            'month' => $request->input('month'),
+        ]));
+        return redirect('/admin/events'.($qs ? '?'.$qs : ''))->with('successmessage', 'Date added.');
     }
 
     /**

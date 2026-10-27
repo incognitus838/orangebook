@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Orangebook'),
 
     'platform_domain' => env('PLATFORM_DOMAIN', 'localhost'),
 
@@ -174,7 +174,7 @@ return [
         ///
         App\Schoolplus\StudentServiceProvider::class,
         // Nova Theme
-        //Gegosoft\NovaGego\ThemeServiceProvider::class,
+        // Nova theme (unused)
         App\Conference\ConferenceServiceProvider::class,
         App\Calendar\CalendarServiceProvider::class,
        // Gegok12\Inventory\InventoryServiceProvider::class

@@ -19,6 +19,7 @@ use App\Models\AbsentReason;
 use App\Traits\LogActivity;
 use App\Helpers\SiteHelper;
 use App\Models\Attendance;
+use App\Models\User;
 use League\Csv\Writer;
 use App\Traits\Common;
 use Carbon\Carbon;
@@ -207,6 +208,19 @@ class AttendanceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function teacher()
+    {
+        $school_id = Auth::user()->school_id;
+        $academic_year = SiteHelper::getAcademicYear($school_id);
+        $absentees = Attendance::where('school_id', $school_id)
+            ->when($academic_year, fn ($q) => $q->where('academic_year_id', $academic_year->id))
+            ->whereDate('date', date('Y-m-d'))
+            ->where('status', 0)
+            ->whereHas('user', fn ($q) => $q->where('usergroup_id', User::TEACHER_USERGROUP_ID));
+
+        return ['teacherAbsentees' => $absentees->count()];
+    }
+
     public function student()
     {
         //

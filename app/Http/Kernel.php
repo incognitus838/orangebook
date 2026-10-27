@@ -73,6 +73,7 @@ class Kernel extends HttpKernel
         'permission'            =>  \Laratrust\Middleware\Permission::class,
         'ability'               =>  \Laratrust\Middleware\Ability::class,
 
+        'product.only'          =>  \App\Http\Middleware\BlockUnusedForkRoutes::class,
         'schooladmin'           =>  \App\Http\Middleware\MustBeSchoolAdmin::class,
         'schoolsubadmin'        =>  \App\Http\Middleware\MustBeSchoolSubAdmin::class,
         'teacher'               =>  \App\Http\Middleware\MustBeTeacher::class,  

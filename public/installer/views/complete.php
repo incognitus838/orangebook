@@ -7,7 +7,7 @@
         </div>
         <h2 class="text-3xl font-bold text-gray-800 mb-2">Installation Complete!</h2>
         <p class="text-gray-600 max-w-md mx-auto">
-            Congratulations! Gego K12 has been successfully installed and configured on your server.
+            Orangebook is installed and ready on this server.
         </p>
     </div>
 

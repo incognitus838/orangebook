@@ -49,19 +49,12 @@ class DashboardController extends Controller
     *
     * @return \Illuminate\Http\Response
     */
-    public function index(Request $request) 
+    public function index(\App\Services\SchoolDayService $day)
     {
-
-        $admin_id  =   Auth::id();
-        $school_id =   Auth::user()->school_id;
-
-        $dashboard = $this->adminDashboard( $school_id, $admin_id );
-
-        $standardLink = StandardLink::where('id',$request->standardLink_id)->first();
-        
-        $selected_teacher = User::where('id',$request->teacher_id)->first();
-
-        return view( '/admin/dashboard/dashboard', ['dashboard' => $dashboard , 'standardLink' => $standardLink , 'selected_teacher' => $selected_teacher ] );
+        return view('crest.day.dashboard', [
+            'layout' => 'layouts.admin.layout',
+            'day' => $day->principal(Auth::user()),
+        ]);
     }
 
     /**

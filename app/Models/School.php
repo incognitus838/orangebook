@@ -78,7 +78,7 @@ class School extends Model
      * @var array
      */
     protected $fillable = [
-        'name' , 'email' , 'phone' , 'address' , 'country_id' , 'state_id' , 'city_id' , 'pincode' , 'slug' , 'status', 'primary_color', 'custom_domain', 'join_code'
+        'name' , 'email' , 'phone' , 'address' , 'country_id' , 'state_id' , 'city_id' , 'pincode' , 'slug' , 'status', 'primary_color', 'custom_domain', 'join_code', 'kind'
     ];
 
     /**
@@ -86,6 +86,87 @@ class School extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function usesParents(): bool
+    {
+        return ($this->kind ?? 'school') === 'school';
+    }
+
+    public function kindLabel(): string
+    {
+        return match ($this->kind ?? 'school') {
+            'ngo' => 'NGO / programme',
+            'training' => 'Training firm',
+            default => 'School',
+        };
+    }
+
+    public function learnerWord(): string
+    {
+        return $this->usesParents() ? 'Students' : 'Learners';
+    }
+
+    public function staffWord(): string
+    {
+        return $this->usesParents() ? 'Teachers' : 'Facilitators';
+    }
+
+    public function staffWordOne(): string
+    {
+        return $this->usesParents() ? 'Teacher' : 'Facilitator';
+    }
+
+    public function learnerWordOne(): string
+    {
+        return $this->usesParents() ? 'Student' : 'Learner';
+    }
+
+    public function classWord(): string
+    {
+        return $this->usesParents() ? 'Classes' : 'Cohorts';
+    }
+
+    public function classWordOne(): string
+    {
+        return $this->usesParents() ? 'Class' : 'Cohort';
+    }
+
+    public function orgWord(): string
+    {
+        return match ($this->kind ?? 'school') {
+            'ngo' => 'Programme',
+            'training' => 'Training firm',
+            default => 'School',
+        };
+    }
+
+    public function groupHint(): string
+    {
+        return match ($this->kind ?? 'school') {
+            'ngo' => 'A named list you can send to again, for example morning facilitators.',
+            'training' => 'A named list you can send to again, for example weekend cohort leads.',
+            default => 'A named list you can send to again, for example PTA or form teachers.',
+        };
+    }
+
+    public function roleGroupLabels(): array
+    {
+        $labels = [
+            'teachers' => $this->staffWord(),
+            'students' => $this->learnerWord(),
+            'staff' => 'All staff',
+        ];
+        if ($this->usesParents()) {
+            $labels['parents'] = 'Parents';
+            $labels['nonteaching'] = 'Non-teaching staff';
+        }
+        return $labels;
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
     public function country()
     {
       return $this->belongsTo('App\Models\Country','country_id');
@@ -262,7 +343,7 @@ class School extends Model
                         . "<br/>". $this->city
                         . "<br />" .$this->pincode
                         . "<br /> ". $this->state
-                        . "<br /> ". "India" ;
+                        . "<br /> ". "Nigeria" ;
 
         return $fulladdress;
 

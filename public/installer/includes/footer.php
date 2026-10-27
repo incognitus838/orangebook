@@ -4,8 +4,7 @@
         <!-- Footer -->
         <footer class="bg-white border-t py-4">
             <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-                &copy; <?php echo date('Y'); ?> Gego K12. All rights reserved. |
-                <a href="https://gegok12.com" target="_blank" class="text-purple-600 hover:underline">Documentation</a>
+                &copy; <?php echo date('Y'); ?> Orangebook. All rights reserved.
             </div>
         </footer>
     </div>

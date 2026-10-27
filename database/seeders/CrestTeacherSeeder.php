@@ -44,7 +44,7 @@ class CrestTeacherSeeder extends Seeder
         }
 
         $teacher = User::updateOrCreate(
-            ['email' => 'teacher@crest.ng'],
+            ['email' => 'teacher@orangebook.ng'],
             [
                 'school_id' => $schoolId,
                 'usergroup_id' => 5,

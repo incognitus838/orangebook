@@ -67,7 +67,7 @@ class AdmissionController extends Controller
 
         $closedetails = SchoolDetail::where('school_id',$school->id)->where('meta_key','admission_close_message')->first();
 
-        return view('/pages/admission/admission',['admission_open' => $admission_open , 'closedetails' => $closedetails , 'slug' => $slug , 'logo' => $logo]);
+        return view('/pages/admission/admission',['admission_open' => $admission_open , 'closedetails' => $closedetails , 'slug' => $slug , 'logo' => $logo, 'school' => $school]);
     }
 
     /**

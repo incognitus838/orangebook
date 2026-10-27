@@ -80,11 +80,13 @@ class TeacherAddController extends Controller
      */
     public function create()
     {
-      //
-      $count    = User::where('school_id',Auth::user()->school_id)->where('usergroup_id',5)->count();
-      $subscription = Subscription::with('plan')->where('school_id',Auth::user()->school_id)->first();
+      $schoolId = Auth::user()->school_id;
+      $year = SiteHelper::getAcademicYear($schoolId);
+      $classes = $year
+          ? \App\Models\StandardLink::with('standard', 'section')->where('school_id', $schoolId)->where('academic_year_id', $year->id)->get()
+          : collect();
 
-      return view('/admin/teacher/create',['count'=>$count , 'subscription'=>$subscription]);
+      return view('/admin/teacher/create', ['classes' => $classes]);
     }
 
     /**
@@ -165,55 +167,33 @@ class TeacherAddController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, \App\Services\SchoolJoinService $join)
     {
-      //
-      try
-      {
-        $school_id = Auth::user()->school_id;
-
-        $academic_year = SiteHelper::getAcademicYear(Auth::user()->school_id);
-
-        $path = \Session::get('avatar_path');
-        if($request->designation=="librarian")
-        {
-          $usergroup_id=8;
+        $data = $request->validate([
+            'name' => 'required|string|max:80',
+            'email' => 'required|email',
+            'phone' => 'nullable|string|max:20',
+            'role' => 'nullable|in:teaching,nonteaching',
+            'class_id' => 'nullable|integer',
+            'subjects' => 'nullable|string|max:240',
+        ]);
+        $school = Auth::user()->school;
+        if (User::where('email', $data['email'])->exists()) {
+            return back()->with('failmessage', 'That email already has a login.')->withInput();
         }
-        else if($request->designation=="receptionist")
-        {
-          $usergroup_id=10;
+        $classId = null;
+        if (! empty($data['class_id'])) {
+            $classId = \App\Models\StandardLink::where('id', $data['class_id'])->where('school_id', $school->id)->value('id');
         }
-        else if($request->designation=="accountant")
-        {
-          $usergroup_id= 11;
-        }
-        else if($request->designation=="others")
-        {
-          $usergroup_id= 13;
-        }
-        else
-        {
-          $usergroup_id=5;
-        }
+        $join->inviteStaff(Auth::user(), [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'usergroup_id' => ($data['role'] ?? 'teaching') === 'nonteaching' ? User::NON_TEACHING_USERGROUP_ID : User::TEACHER_USERGROUP_ID,
+            'class_id' => $classId,
+            'subjects' => array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string) ($data['subjects'] ?? ''))))),
+        ]);
 
-        $user = $this->CreateTeacher($request , $school_id , $academic_year , $path,$usergroup_id);
-        $mes = trans('messages.add_success_msg',['module' => 'Teacher']);
-        \Session::forget('avatar_path');
-
-        $ip= $this->getRequestIP();
-        $this->doActivityLog(
-          $user,
-          Auth::user(),
-          ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
-          LOGNAME_ADD_TEACHER,
-          $mes
-        ); 
-
-        return redirect()->back()->with('successmessage',$mes);
-      }
-      catch(Exception $e)
-      {
-        //dd($e->getMessage());
-      } 
+        return redirect('/admin/teachers')->with('successmessage', $data['name'].' has an invite. They set their own password from the mail.');
     }
 }

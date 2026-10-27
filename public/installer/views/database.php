@@ -30,7 +30,7 @@
             <label for="db_name" class="block text-sm font-medium text-gray-700 mb-2">Database Name</label>
             <input type="text" id="db_name" name="db_name" required
                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                placeholder="gegok12">
+                placeholder="crest">
             <p class="text-xs text-gray-500 mt-1">Database will be created if it doesn't exist</p>
         </div>
 

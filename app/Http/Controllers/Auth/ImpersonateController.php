@@ -1,165 +1,85 @@
 <?php
-/**
- * SPDX-License-Identifier: MIT
- * (c) 2025 GegoSoft Technologies and GegoK12 Contributors
- */
+
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Traits\Common;
 use App\Models\User;
-use Exception;
-use Log;
+use Illuminate\Support\Facades\Auth;
 
 class ImpersonateController extends Controller
 {
-    use Common;
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function impersonate($id)
+    public function start($id)
     {
-        try
-        {
-            $user = User::find($id);
-              
-            $is_admin = $this->is_admin($user->id);
-            if($is_admin == false)
-            { 
-                Auth::user()->setImpersonating($user->id);
-            }
-            else
-            {
-                \Session::put('Impersonate disabled for this user.');
-            }
+        $admin = Auth::user();
+        if (! $admin || ! $admin->isAdmin()) {
+            abort(403);
+        }
 
-            return redirect('/teacher/dashboard');
-        }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            //dd($e->getMessage());
-        }
+        $target = User::where('id', $id)
+            ->where('school_id', $admin->school_id)
+            ->where('status', 'active')
+            ->whereIn('usergroup_id', [
+                User::TEACHER_USERGROUP_ID,
+                User::STUDENT_USERGROUP_ID,
+                User::PARENT_USERGROUP_ID,
+                User::LIBRARIAN_USERGROUP_ID,
+            ])
+            ->firstOrFail();
+
+        $admin->setImpersonating($target->id);
+        session(['impersonator_id' => $admin->id]);
+
+        return redirect($target->homePath())->with('successmessage', 'You are viewing '.$target->name.'’s desk.');
     }
 
-    public function librarianimpersonate($id)
+    public function impersonate($id)
     {
-        try
-        {
-            $user = User::find($id);
-              
-            $is_admin = $this->is_admin($user->id);
-            if($is_admin == false)
-            { 
-                Auth::user()->setImpersonating($user->id);
-            }
-            else
-            {
-                \Session::put('Impersonate disabled for this user.');
-            }
-
-            return redirect('/library/dashboard');
-        }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            //dd($e->getMessage());
-        }
+        return $this->start($id);
     }
 
     public function studentimpersonate($id)
     {
-        try
-        {
-            $user = User::find($id);
-              
-            $is_admin = $this->is_admin($user->id);
-            if($is_admin == false)
-            { 
-                Auth::user()->setImpersonating($user->id);
-            }
-            else
-            {
-                \Session::put('Impersonate disabled for this user.');
-            }
+        return $this->start($id);
+    }
 
-            return redirect('/student/dashboard');
-        }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            //dd($e->getMessage());
-        }
+    public function librarianimpersonate($id)
+    {
+        return $this->start($id);
     }
 
     public function schoolAdminimpersonate($id)
     {
-        try
-        {
-            $user = User::find($id);
-              
-            $is_admin = $this->is_admin($user->id);
-            if($is_admin == true)
-            { //dd('if');
-                Auth::user()->setImpersonating($user->id);
-            }
-            else
-            {//dd('false');
-                \Session::put('Impersonate disabled for this user.');
-            }
+        $actor = Auth::user();
+        if (! $actor || ! $actor->isSiteAdmin()) {
+            abort(403);
+        }
+        $target = User::where('id', $id)->where('usergroup_id', User::SCHOOLADMIN_USERGROUP_ID)->firstOrFail();
+        $actor->setImpersonating($target->id);
+        session(['impersonator_id' => $actor->id]);
 
-            return redirect('/admin/dashboard');
-        }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            //dd($e->getMessage());
-        }
+        return redirect('/admin/dashboard');
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function stopImpersonate()
-    {  
-        try
-        {      
-            $user = User::where('id', Auth::user()->id)->first();
+    public function stop()
+    {
+        $home = '/admin/dashboard';
+        $adminId = session('impersonator_id');
+        if (Auth::user()) {
             Auth::user()->stopImpersonating();
-           // dd($user->usergroup_id);
-            if ($user->usergroup_id == 5)
-            {
-                return redirect('/teacher/dashboard');
-            } 
-            elseif ($user->usergroup_id == 3)
-            {
-                return redirect('/superadmin/dashboard');
-
-                //return redirect('/admin/dashboard');
-            }
-            elseif ($user->usergroup_id == 6)   
-            {
-                return redirect('/student/dashboard');
-            } 
-            elseif ($user->usergroup_id == 8)   
-            {
-                return redirect('/library/dashboard');
-            } 
-            /*elseif ($user->usergroup_id == 1)   
-            {
-                return redirect('/superadmin/dashboard');
-            } */
         }
-        catch(Exception $e)
-        {
-            Log::info($e->getMessage());
-            //dd($e->getMessage());
-        } 
+        session()->forget('impersonator_id');
+        if ($adminId) {
+            $admin = User::find($adminId);
+            if ($admin) {
+                $home = $admin->homePath();
+            }
+        }
+
+        return redirect($home)->with('successmessage', 'Back at the admin desk.');
+    }
+
+    public function stopImpersonate()
+    {
+        return $this->stop();
     }
 }

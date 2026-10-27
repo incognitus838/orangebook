@@ -35,7 +35,7 @@ tr:nth-child(even) {
     <th>Class</th>
     <th>Parent Name</th>
     <th>Mobile Number</th>
-    <th>Aadhaar Number </th>
+
     
   </tr>
   @foreach($users as $user)
@@ -44,7 +44,7 @@ tr:nth-child(even) {
     <td>{{$user->studentAcademicLatest->standardLink->StandardSection}}</td>
     <td> @if(count($user->parents)>0){{$user->parents[0]['userParent']['userprofile']['firstname'].' '.$user->parents[0]['userParent']['userprofile']['lastname']}}@endif</td>
     <td>@if(count($user->parents)>0){{$user->parents[0]['userParent']['mobile_no']}}@endif</td> 
-    <td>{{$user->userprofile->aadhar_number}}</td>
+
   </tr>
   @endforeach
   

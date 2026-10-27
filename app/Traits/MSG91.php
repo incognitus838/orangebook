@@ -104,7 +104,7 @@ trait MSG91
      * Send OTP via SMS
      *
      * Generates and sends a One-Time Password (OTP) to the specified mobile number.
-     * Message format: "Welcome to GegoK12. Your OTP is : [OTP]"
+     * Message format: "Welcome to Orangebook. Your OTP is : [OTP]"
      * Uses reminder API credentials from environment variables.
      *
      * @param string $OTP The OTP code to send
@@ -121,7 +121,7 @@ trait MSG91
             $ROUTE_NO = env('SMS_GATEWAY_ROUTE_NO');
 
             // Prepare OTP message with welcome text
-            $message = urlencode("Welcome to GegoK12. Your OTP is : $OTP");
+            $message = urlencode("Welcome to Orangebook. Your OTP is : $OTP");
 
             // Prepare POST parameters for API request
             $postData = array(
@@ -168,7 +168,7 @@ trait MSG91
      * Send Emergency SMS Notification
      *
      * Sends an emergency notification SMS to one or more mobile numbers.
-     * Message format: "GegoK12. Message : [message_content]"
+     * Message format: "Orangebook. Message : [message_content]"
      * Uses reminder API credentials from environment variables.
      *
      * @param string $message_content The emergency notification message
@@ -185,7 +185,7 @@ trait MSG91
             $ROUTE_NO = env('SMS_GATEWAY_ROUTE_NO');
 
             // Prepare emergency message with app branding
-            $message = urlencode("GegoK12. Message : $message_content");
+            $message = urlencode("Orangebook. Message : $message_content");
 
             // Prepare POST parameters for API request
             $postData = array(

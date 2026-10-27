@@ -26,6 +26,7 @@ use App\Models\Standard;
 use App\Traits\Common;
 use App\Models\User;
 use App\Models\Group;
+use App\Services\LearnerEnrollmentService;
 use Carbon\Carbon;
 use Exception;
 use Hash;
@@ -78,35 +79,47 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear($school_id);
-        $count    = StudentUser::ByRole(6)->where('school_id',$school_id)->where('deleted_at',NULL)->//count();dd($count);
-        $alphabet = request('alphabet')?request('alphabet'):'';
-        $query    = \Request::getQueryString();
-        $standardLink = SiteHelper::getStandardLinkList($school_id);
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $classes = $year
+            ? StandardLink::with('standard', 'section')
+                ->where('school_id', $schoolId)
+                ->where('academic_year_id', $year->id)
+                ->get()
+            : collect();
 
-        $lowest_standard = Standard::where('school_id',$school_id)->orderBy('order')->first();
+        $students = User::where('school_id', $schoolId)
+            ->where('usergroup_id', User::STUDENT_USERGROUP_ID)
+            ->when($request->query('status') === 'blocked', fn ($q) => $q->where('status', '!=', 'active'), fn ($q) => $q->where('status', 'active'))
+            ->with(['studentAcademicLatest.standardLink.standard', 'studentAcademicLatest.standardLink.section'])
+            ->when($request->filled('class_id'), function ($q) use ($request) {
+                $q->whereHas('studentAcademicLatest', fn ($s) => $s->where('standardLink_id', $request->class_id));
+            })
+            ->when($request->boolean('no_parent'), function ($q) {
+                $q->whereDoesntHave('parents');
+            })
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = $request->q;
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('name', 'like', '%'.$term.'%')
+                        ->orWhere('email', 'like', '%'.$term.'%')
+                        ->orWhere('mobile_no', 'like', '%'.$term.'%')
+                        ->orWhere('registration_number', 'like', '%'.$term.'%');
+                });
+            })
+            ->orderBy('name')
+            ->paginate(50)
+            ->withQueryString();
 
-        if(count((array)\Request::getQueryString()) == 0)
-        {
-            $standard = StandardLink::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['standard_id',$lowest_standard->id]])->first();
-        }
-        if(request('date_of_birth') != null)
-        {
-            $birthday = 'true';
-        }
-        if(request('standard') != null)
-        {
-            $selected_standard = request('standard');
-        }
-        else
-        {
-            $selected_standard = $standard->id;
-        }
-
-        return view('/admin/member/index',[ 'alphabet' => $alphabet , 'query' => $query , 'count' => $count , 'standardLinks' => $standardLink , 'standard' => $standard->id , 'birthday' => $birthday , 'selected_standard' => $selected_standard ]);
+        return view('/admin/member/index', [
+            'students' => $students,
+            'classes' => $classes,
+            'classId' => $request->query('class_id'),
+            'search' => $request->query('q'),
+            'noParent' => $request->boolean('no_parent'),
+        ]);
     }
 
     /**
@@ -116,11 +129,18 @@ class StudentController extends Controller
      */
     public function create()
     {
-      //
-      $count    = StudentUser::where('school_id',Auth::user()->school_id)->where('usergroup_id',6)->count();
-      $subscription = Subscription::where('school_id',Auth::user()->school_id)->first();
+      $schoolId = Auth::user()->school_id;
+      $year = SiteHelper::getAcademicYear($schoolId);
+      $classes = $year
+          ? StandardLink::with('standard', 'section')->where('school_id', $schoolId)->where('academic_year_id', $year->id)->get()
+          : collect();
 
-      return view('/admin/member/create',['count'=>$count , 'subscription'=>$subscription]);
+      $school = Auth::user()->school;
+
+      return view('/admin/member/create', [
+          'classes' => $classes,
+          'school' => $school,
+      ]);
     }
 
     /**
@@ -200,45 +220,47 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-      //
-      try
-      {
-        $school_id = Auth::user()->school_id;
-
-        $academic_year = SiteHelper::getAcademicYear($school_id);
-
-        $file = $request->file('avatar');
-        if($file)
-        {
-          $folder=Auth::user()->school->slug.'/student/avatar';
-          $path = $this->uploadFile($folder,$file); 
+        $school = Auth::user()->school;
+        $data = $request->validate([
+            'first_name' => 'required|string|max:40',
+            'last_name' => 'nullable|string|max:40',
+            'other_names' => 'nullable|string|max:40',
+            'gender' => 'nullable|in:male,female',
+            'date_of_birth' => 'nullable|date',
+            'class_id' => 'required|integer',
+            'admission_no' => 'nullable|string|max:40',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:20',
+            'parent_name' => 'nullable|string|max:80',
+            'parent_email' => 'nullable|email',
+            'parent_phone' => 'nullable|string|max:20',
+            'relationship' => 'nullable|string|max:40',
+        ]);
+        $class = StandardLink::where('id', $data['class_id'])->where('school_id', $school->id)->firstOrFail();
+        $result = app(LearnerEnrollmentService::class)->enroll($school, $data, $class);
+        $slips = [LearnerEnrollmentService::slip($result['user'], $result['pin'], $class->StandardSection)];
+        if ($result['parent'] && $result['parent_pin']) {
+            $slips[] = LearnerEnrollmentService::slip($result['parent'], $result['parent_pin'], 'Parent');
         }
-        else
-        {
-          $path = '';
+        session(['login_slips' => $slips]);
+
+        if ($result['pin'] === '') {
+            return redirect('/admin/students/'.$result['user']->id)->with('successmessage', $result['user']->name.' is now also in '.$class->StandardSection.'.');
         }
 
-        $user = $this->CreateUser($request , $school_id , $academic_year->id , $path , 6);
-        $mes = trans('messages.add_success_msg',['module' => 'Student']);
-
-        $ip= $this->getRequestIP();
-        $this->doActivityLog(
-          $user,
-          Auth::user(),
-          ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
-          LOGNAME_ADD_STUDENT,
-          $mes
-        ); 
-
-        return redirect()->back()->with('successmessage',$mes);
-      }
-      catch(Exception $e)
-      {
-        //dd($e->getMessage());
-      } 
+        return redirect('/admin/students/slips')->with('successmessage', $result['user']->name.' added to '.$class->StandardSection.'. Print the login slip now; the PIN is shown once.');
     }
 
-  
+    public function slips()
+    {
+        $slips = session('login_slips', []);
+        $school = Auth::user()->school;
+
+        return view('admin.member.slips', [
+            'slips' => $slips,
+            'school' => $school,
+        ]);
+    }
 
     /**
      * Fetch student data for edit API.
@@ -320,17 +342,7 @@ class StudentController extends Controller
      */
     public function edit($name)
     {
-      //
-      $user = StudentUser::where('name',$name)->first();
-      $userprofile = Userprofile::where('user_id',$user->id)->first();
-      if(Gate::allows('member',$user))
-      {
-        return view('/admin/member/edit',['user' => $user , 'userprofile' => $userprofile ]);
-      }
-      else
-      {
-        abort(403);
-      } 
+      return redirect('/admin/student/show/'.rawurlencode($name));
     }
 
     /**
@@ -448,32 +460,6 @@ class StudentController extends Controller
      */
     public function blockedstudents()
     {
-        $school_id = Auth::user()->school_id;
-        $academic_year = SiteHelper::getAcademicYear($school_id);
-        $count    = StudentUser::ByRole(6)->where([['school_id',$school_id],['status','inactive']])->where('deleted_at',NULL)->count();
-        $alphabet = request('alphabet')?request('alphabet'):'';
-        $query    = \Request::getQueryString();
-        $standardLink = SiteHelper::getStandardLinkList($school_id);
-
-        $lowest_standard = Standard::where('school_id',$school_id)->orderBy('order')->first();
-
-        if(count(\Request::getQueryString()) == 0)
-        {
-            $standard = StandardLink::where([['school_id',$school_id],['academic_year_id',$academic_year->id]])->first();
-        }
-        if(request('date_of_birth') != null)
-        {
-            $birthday = 'true';
-        }
-        if(request('standard') != null)
-        {
-            $selected_standard = request('standard');
-        }
-        else
-        {
-            $selected_standard = $standard->id;
-        }
-
-        return view('/admin/member/blockedstudents',[ 'alphabet' => $alphabet , 'query' => $query , 'count' => $count , 'standardLinks' => $standardLink , 'standard' => $standard->id , 'birthday' => $birthday , 'selected_standard' => $selected_standard ]);
+        return redirect('/admin/students?status=blocked');
     }
 }

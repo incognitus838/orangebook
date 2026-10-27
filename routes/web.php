@@ -7,31 +7,43 @@ use App\Http\Controllers\Superadmin\DashboardController;
     //return view('welcome');
 });*/
 Route::get('/', 'MarketingController@home');
+Route::get('/privacy', 'MarketingController@privacy');
+Route::get('/terms', 'MarketingController@terms');
 Route::get('/start', 'StartSchoolController@create');
 Route::post('/start', 'StartSchoolController@store');
 Route::get('/join', 'JoinController@create');
 Route::post('/join', 'JoinController@store');
+Route::get('/join/student', 'JoinController@studentCreate');
+Route::post('/join/student', 'JoinController@studentStore');
 Route::get('/staff/join/{token}', 'StaffJoinController@show');
 Route::post('/staff/join/{token}', 'StaffJoinController@store');
 
 Route::group(['middleware' => ['web', 'auth', 'siteadmin'], 'prefix' => 'platform', 'namespace' => 'Platform'], function () {
     Route::get('/', 'DashboardController@index');
-    Route::post('/schools/{id}/plan', 'DashboardController@updatePlan');
+    Route::get('/organisations', 'DashboardController@organisations');
+    Route::get('/organisations/{id}', 'DashboardController@show');
+    Route::post('/organisations/{id}/open', 'DashboardController@open');
+    Route::post('/organisations/{id}/toggle', 'DashboardController@toggle');
+    Route::get('/applications', 'DashboardController@applications');
+    Route::post('/applications/{id}/approve', 'DashboardController@approveApplication');
     Route::post('/schools/{id}/toggle', 'DashboardController@toggle');
 });
+Route::get('/platform/return', 'Platform\DashboardController@return')->middleware(['web', 'auth']);
 
 
 Auth::routes();
 
 
 
-//Impersonate as teacher
-Route::get('/teacher/{id}/impersonate', 'Auth\ImpersonateController@impersonate')->middleware('auth', 'schooladmin');
-Route::get('/library/{id}/impersonate', 'Auth\ImpersonateController@librarianimpersonate')->middleware('auth', 'schooladmin');
-Route::get('/student/{id}/impersonate', 'Auth\ImpersonateController@studentimpersonate')->middleware('auth', 'schooladmin');
-Route::get('/teacher/impersonate/stop', 'Auth\ImpersonateController@stopImpersonate');
+Route::post('/admin/people/{id}/open', 'Auth\ImpersonateController@start')->middleware(['auth', 'schooladmin'])->whereNumber('id');
+Route::get('/teacher/{id}/impersonate', 'Auth\ImpersonateController@start')->middleware(['auth', 'schooladmin'])->whereNumber('id');
+Route::get('/library/{id}/impersonate', 'Auth\ImpersonateController@start')->middleware(['auth', 'schooladmin'])->whereNumber('id');
+Route::get('/student/{id}/impersonate', 'Auth\ImpersonateController@start')->middleware(['auth', 'schooladmin'])->whereNumber('id');
+Route::get('/parent/{id}/impersonate', 'Auth\ImpersonateController@start')->middleware(['auth', 'schooladmin'])->whereNumber('id');
+Route::match(['get', 'post'], '/impersonate/stop', 'Auth\ImpersonateController@stop')->middleware('auth');
+Route::get('/teacher/impersonate/stop', 'Auth\ImpersonateController@stop')->middleware('auth');
 
-Route::get('/schooladmin/{id}/impersonate', 'Auth\ImpersonateController@schoolAdminimpersonate')->middleware('auth', 'superadmin');
+Route::get('/schooladmin/{id}/impersonate', 'Auth\ImpersonateController@schoolAdminimpersonate')->middleware(['auth', 'superadmin']);
 
 //Reset Password for member
 // Route::get('/password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');

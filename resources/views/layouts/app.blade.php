@@ -7,12 +7,25 @@
         @include('layouts.partials.favicon')
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ optional($tenantSchool)->name ?? config('app.name', 'Crest') }}</title>
+        <title>{{ optional($tenantSchool)->name ?? config('app.name') }}</title>
         <!-- Styles -->
 
         <!-- <link href="{{ asset('css/app.css') }}" rel="stylesheet"> -->
         <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
         <link href="{{ asset('css/crest.css') }}" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600&family=Instrument+Serif&display=swap" rel="stylesheet">
+        <link href="{{ asset('css/ob-paper.css') }}?v={{ @filemtime(public_path('css/ob-paper.css')) }}" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+        <link href="{{ asset('css/ob-saas.css') }}?v={{ @filemtime(public_path('css/ob-saas.css')) }}" rel="stylesheet">
+        @php
+            $obSchool = $tenantColor ?? '#1B2A4A';
+            if (!is_string($obSchool) || !preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $obSchool)) {
+                $obSchool = '#1B2A4A';
+            }
+        @endphp
+        <style>:root { --ob-school: {{ $obSchool }}; --ob-stripe: {{ $obSchool }}; }</style>
 
          <script>
         window.User = {!! json_encode(optional(auth()->user())->only('id')) !!}
@@ -41,15 +54,14 @@
  <livewire:styles>
 
     </head>
-    <style>:root { --crest-primary: {{ $tenantColor ?? '#1B2A4A' }}; }</style>
-    <body class="font-primary antialiased min-h-screen overflow-x-hidden">
+    <body class="ob-app font-primary antialiased min-h-screen overflow-x-hidden">
         <div id="app">
             @yield('base-navigation')
-            <main class="flex w-full h-full min-h-screen">
+            <main class="flex w-full h-full min-h-screen ob-frame">
                 <div class="sidebar min-h-full">
                     @yield('base-sidebar')
                 </div>
-                <div class="bg-gray-200 grow w-full px-4" style="width: calc(100vw - 195px);">
+                <div class="crest-app-main ob-main grow w-full px-4">
                     @yield('base-content')
                 </div>
             </main>
@@ -63,6 +75,13 @@
         <script src="{{ mix('js/vendor.js') }}"></script>
         <script src="{{ mix('js/app.js') }}"></script>
         <script src="{{ asset('js/custom.js') }}" ></script>
+        <script>
+        (function () {
+            var h = document.querySelector('.crest-app-main h1, .ob-main h1');
+            var t = h && h.textContent.replace(/\s+/g, ' ').trim();
+            if (t && document.title.indexOf(t) !== 0) document.title = t + ' · ' + document.title;
+        })();
+        </script>
         @stack('scripts')
 
         <livewire:scripts>

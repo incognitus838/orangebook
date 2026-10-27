@@ -1,4 +1,10 @@
 @extends('layouts.student.layout')
 @section('content')
-	<change-password-student dusk="change-password"></change-password-student>
+<div class="ob-page">
+    <div class="ob-head">
+        <h1 class="admin-h1">Change password</h1>
+    </div>
+    @include('partials.message')
+    @include('crest.account._password_form', ['action' => url('/student/changepassword')])
+</div>
 @endsection

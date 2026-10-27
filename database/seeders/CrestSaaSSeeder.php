@@ -18,11 +18,11 @@ class CrestSaaSSeeder extends Seeder
         $this->call(PlansTableSeeder::class);
 
         $platform = User::updateOrCreate(
-            ['email' => 'platform@crest.ng'],
+            ['email' => 'platform@orangebook.ng'],
             [
                 'school_id' => null,
                 'usergroup_id' => 1,
-                'name' => 'Crest Platform',
+                'name' => 'Orangebook Platform',
                 'mobile_no' => '08030000001',
                 'password' => Hash::make('password'),
                 'status' => 'active',
@@ -32,11 +32,13 @@ class CrestSaaSSeeder extends Seeder
         );
         Userprofile::updateOrCreate(
             ['user_id' => $platform->id],
-            ['usergroup_id' => 1, 'firstname' => 'Crest', 'lastname' => 'Platform', 'status' => 'active']
+            ['usergroup_id' => 1, 'firstname' => 'Orangebook', 'lastname' => 'Platform', 'status' => 'active']
         );
 
         $pro = Plan::where('name', 'pro')->first();
-        $crest = School::where('slug', 'crest-secondary')->first() ?: School::find(1);
+        $crest = School::where('slug', 'ikeja-secondary')->first()
+            ?: School::where('slug', 'crest-secondary')->first()
+            ?: School::find(1);
         if ($crest && $pro) {
             $admin = User::where('school_id', $crest->id)->where('usergroup_id', 3)->first();
             Subscription::updateOrCreate(

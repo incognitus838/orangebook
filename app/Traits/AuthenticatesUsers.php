@@ -77,11 +77,7 @@ trait AuthenticatesUsers
          * @return bool True if school is active or user is superadmin
          */
         Validator::extend('checkschool', function ($attribute, $value, $parameters, $validator) {
-            $users = User::orWhere('email', request('email'))
-                ->orWhere('mobile_no', request('email'))
-                ->orWhere('name', request('email'))
-                ->orWhere('registration_number', request('email'))
-                ->first();
+            $users = $this->findLoginUser();
 
             if (!$users) {
                 return FALSE;
@@ -111,8 +107,7 @@ trait AuthenticatesUsers
          * @return bool True if user exists
          */
         Validator::extend('checkusers', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
-            return $users != null;
+            return $this->findLoginUser() != null;
         }, 'Invalid Credentials');
 
         /**
@@ -126,7 +121,16 @@ trait AuthenticatesUsers
          * @return bool True if user is active
          */
         Validator::extend('checkactive', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
+            $users = $this->findLoginUser();
+            if (!$users) {
+                return true;
+            }
+            if ($users->status === 'inactive') {
+                return false;
+            }
+            if (!$users->userprofile) {
+                return true;
+            }
             return $users->userprofile->status != 'inactive';
         }, 'You are suspended by site admin');
 
@@ -141,7 +145,10 @@ trait AuthenticatesUsers
          * @return bool True if user status is not 'exit'
          */
         Validator::extend('checkexit', function ($attribute, $value, $parameters, $validator) {
-            $users = User::where('email', request('email'))->with('userprofile')->first();
+            $users = $this->findLoginUser();
+            if (!$users || !$users->userprofile) {
+                return true;
+            }
             return $users->userprofile->status != 'exit';
         }, 'You have exited this school');
 
@@ -173,6 +180,20 @@ trait AuthenticatesUsers
     protected function credentials(Request $request)
     {
         return $request->only($this->username(), 'password');
+    }
+
+    protected function findLoginUser(): ?User
+    {
+        $login = request('email');
+        if ($login === null || $login === '') {
+            return null;
+        }
+
+        return User::where('email', $login)
+            ->orWhere('mobile_no', $login)
+            ->orWhere('name', $login)
+            ->orWhere('registration_number', $login)
+            ->first();
     }
 
     /**
@@ -229,6 +250,9 @@ trait AuthenticatesUsers
     public function username()
     {
        $login = request()->input('email');
+       if ($login === null || $login === '') {
+           return 'email';
+       }
        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'registration_number';
        request()->merge([$field => $login]);
        return $field;

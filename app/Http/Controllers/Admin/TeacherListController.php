@@ -40,18 +40,65 @@ class TeacherListController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-      //
-      $count    = User::ByRole(5)->where('school_id',Auth::user()->school_id)->count();
-      $alphabet = request('alphabet')?request('alphabet'):'';
-      $query    = \Request::getQueryString();
-      if(request('date_of_birth') != null)
-        {
-            $birthday = 'true';
-        }
+        $schoolId = Auth::user()->school_id;
+        $year = SiteHelper::getAcademicYear($schoolId);
+        $classes = $year
+            ? \App\Models\StandardLink::with('standard', 'section')
+                ->where('school_id', $schoolId)
+                ->where('academic_year_id', $year->id)
+                ->get()
+            : collect();
 
-      return view('/admin/teacher/index',['alphabet'=>$alphabet,'query'=>$query,'birthday' => $birthday,'count'=>$count]);
+        $role = $request->query('role');
+        $groups = match ($role) {
+            'teaching' => [User::TEACHER_USERGROUP_ID],
+            'nonteaching' => [User::LIBRARIAN_USERGROUP_ID, User::RECEPTIONIST_USERGROUP_ID, User::ACCOUNTANT_USERGROUP_ID, User::NON_TEACHING_USERGROUP_ID],
+            default => [User::TEACHER_USERGROUP_ID, User::LIBRARIAN_USERGROUP_ID, User::RECEPTIONIST_USERGROUP_ID, User::ACCOUNTANT_USERGROUP_ID, User::NON_TEACHING_USERGROUP_ID],
+        };
+
+        $teachers = User::where('school_id', $schoolId)
+            ->whereIn('usergroup_id', $groups)
+            ->where('status', 'active')
+            ->with([
+                'standardLink.standard',
+                'standardLink.section',
+                'teacherlink' => function ($q) use ($year) {
+                    if ($year) {
+                        $q->where('academic_year_id', $year->id);
+                    }
+                },
+                'teacherlink.subject',
+                'teacherlink.standardLink.standard',
+                'teacherlink.standardLink.section',
+            ])
+            ->when($request->filled('class_id'), function ($q) use ($request) {
+                $classId = (int) $request->class_id;
+                $q->where(function ($inner) use ($classId) {
+                    $inner->whereHas('standardLink', fn ($s) => $s->where('id', $classId))
+                        ->orWhereHas('teacherlink', fn ($t) => $t->where('standardLink_id', $classId));
+                });
+            })
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = $request->q;
+                $q->where(function ($inner) use ($term) {
+                    $inner->where('name', 'like', '%'.$term.'%')
+                        ->orWhere('email', 'like', '%'.$term.'%')
+                        ->orWhere('mobile_no', 'like', '%'.$term.'%');
+                });
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('/admin/teacher/index', [
+            'teachers' => $teachers,
+            'classes' => $classes,
+            'classId' => $request->query('class_id'),
+            'search' => $request->query('q'),
+            'role' => $role,
+            'year' => $year,
+        ]);
     }
 
     public function destroy($name)

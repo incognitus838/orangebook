@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gego K12 - Installation Wizard</title>
+    <title>Orangebook — Installation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,8 +45,8 @@
                             </svg>
                         </div>
                         <div>
-                            <h1 class="text-2xl font-bold text-white">Gego K12</h1>
-                            <p class="text-purple-200 text-sm">School Management System</p>
+                            <h1 class="text-2xl font-bold text-white">Orangebook</h1>
+                            <p class="text-purple-200 text-sm">Records for every school</p>
                         </div>
                     </div>
                     <div class="text-white text-sm">

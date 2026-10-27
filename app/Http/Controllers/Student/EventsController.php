@@ -29,40 +29,14 @@ class EventsController extends Controller
         //$this->academic_year=$this->academic_year->id;
     }
 
-    function index()
+    function index(\App\Services\SchoolBoardService $board)
     {
-        $school_id      =   Auth::user()->school_id;
-        $academic_year  =   $this->academic_year;
-      
-        /*$events         =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['standard_id',$standardLink_id]])->orWhere('standard_id',NULL)->get();*/
-        $events         =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id]]);
-        //new 
-        if(!config('gexam.enabled', false))
-        {
-            $events =$events->where('category','!=','exam');
-        }
-        $events         =$events ->get();
-        //dd($events);
-        $count          =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->count();
-        $subscription   =   Subscription::where('school_id',$school_id)->first();
-
-        $events = $events->map(function( $event, $key) {
-            $eventData = [ 
-                'id' =>   $event->id,
-                'title' => $event->title, 
-                //'start'=>  $event->start_date->format('Y-m-d').'T'.$event->start_date->format('H:i:s'), 
-                //'end'=> $event->end_date->format('Y-m-d').'T'.$event->end_date->format('H:i:s'),
-
-                'start'=>  date('Y-m-d', strtotime($event->start_date)).'T'.date('H:i:s', strtotime($event->start_date)),
-                'end'=>  date('Y-m-d', strtotime($event->end_date)).'T'.date('H:i:s', strtotime($event->end_date)),
-                'allDay' => $event->allDay 
-            ];
-            //dump($eventData);
-            return $eventData;
-        });
-        $events = json_encode($events);
-       
-        return view('student.events.index',['events'=>$events , 'count'=>$count , 'subscription'=>$subscription]);
+        return view('crest.board.calendar', [
+            'layout' => 'layouts.student.layout',
+            'events' => $board->events(Auth::user()->school_id),
+            'action' => url('/student/events'),
+            'canAdd' => false,
+        ]);
     }
 
     function events()

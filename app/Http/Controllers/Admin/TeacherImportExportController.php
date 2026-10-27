@@ -189,6 +189,9 @@ class TeacherImportExportController extends Controller
    public function teacherexports(Request $request)
    {
     $headings=\Session::get('teacher_headings');
+    if (!$headings) {
+        return redirect('/admin/teachers');
+    }
     $heads=array_values($headings);
     //dd($heads);
      $users = $this->TeacherFilter($request,Auth::user()->school_id,5);    

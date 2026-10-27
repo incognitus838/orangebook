@@ -130,7 +130,7 @@ class User extends Authenticatable implements HasMedia
      * @var array
      */
     protected $fillable = [
-        'school_id' , 'usergroup_id' , 'ref_id' ,'name', 'email', 'password','mobile_no','is_activated', 'email_verification_code' , 'email_verified' , 'email_verified_at' , 'platform_token' , 'remember_token'
+        'school_id' , 'usergroup_id' , 'ref_id' ,'name', 'email', 'password','mobile_no','registration_number','is_activated', 'email_verification_code' , 'email_verified' , 'email_verified_at' , 'platform_token' , 'remember_token'
     ];
 
     /**
@@ -1531,6 +1531,26 @@ class User extends Authenticatable implements HasMedia
     public function isSiteAdmin(): bool
     {
         return (int) $this->usergroup_id === (int) self::SITEADMIN_USERGROUP_ID;
+    }
+
+    public function homePath(): string
+    {
+        if ($this->isSiteAdmin()) {
+            return '/platform';
+        }
+        if ($this->isParent()) {
+            return '/parent/dashboard';
+        }
+        if ($this->isTeacher()) {
+            return '/teacher/dashboard';
+        }
+        if ($this->isStudent()) {
+            return '/student/dashboard';
+        }
+        if ($this->isLibrarian()) {
+            return '/library/dashboard';
+        }
+        return '/admin/dashboard';
     }
 
     public function currentSubscription()

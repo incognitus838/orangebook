@@ -1,10 +1,10 @@
 @extends('layouts.admin.layout')
 @section('content')
 <div>
-    <h1 class="admin-h1 my-3">Invite teacher</h1>
+    <h1 class="admin-h1 my-3">Invite {{ optional(Auth::user()->school)->staffWord() }}</h1>
     @include('partials.message')
     <p class="text-sm mb-4" style="color:var(--crest-muted)">They get a link and set their own password. They cannot join with the parent join code.</p>
-    <form method="POST" action="{{ url('/admin/crest/invite-teacher') }}" class="crest-form bg-white border p-4 max-w-lg" style="border-color:var(--crest-rule)">
+    <form method="POST" action="{{ url('/admin/invite-teacher') }}" class="crest-form bg-white border p-4 max-w-lg" style="border-color:var(--crest-rule)">
         @csrf
         <label>Name</label>
         <input name="name" required>

@@ -54,15 +54,10 @@ class RouteServiceProvider extends ServiceProvider
         //$this->mapStaticRoutes(); //static routes hidden
         $this->mapAdminRoutes();
         $this->mapSettingsRoutes();
-        $this->mapInventoryRoutes();
-        $this->mapStockRoutes();
-        $this->mapLibrarianRoutes();
         $this->mapStudentRoutes();
         $this->mapTeacherRoutes();
         $this->mapParentRoutes();
-        $this->mapReceptionistRoutes();
         $this->mapAccountantRoutes();
-        $this->mapPayrollRoutes();
         // $this->mapAlumniRoutes(); // Moved to add-on module
         $this->mapSuperadminRoutes();
         //
@@ -100,7 +95,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapAdminRoutes()
     {
         Route::prefix('admin')
-            ->middleware(['web','auth', 'schooladmin', 'privilegeconditions']) //, 'verifyotp'
+            ->middleware(['web','auth', 'schooladmin', 'privilegeconditions', 'product.only']) //, 'verifyotp'
             ->namespace($this->adminNamespace)
             ->group(base_path('routes/admin.php'));
     }
@@ -108,7 +103,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapSettingsRoutes()
     {
         Route::prefix('admin')
-            ->middleware(['web','auth', 'schooladmin'])
+            ->middleware(['web','auth', 'schooladmin', 'product.only'])
             ->namespace($this->adminNamespace)
             ->group(base_path('routes/setting.php'));
     }
@@ -140,7 +135,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapStudentRoutes()
     {
         Route::prefix('student')
-            ->middleware(['web','auth', 'student'])
+            ->middleware(['web','auth', 'student', 'product.only'])
             ->namespace($this->studentNamespace)
             ->group(base_path('routes/student.php'));
     }
@@ -155,7 +150,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapTeacherRoutes()
     {
         Route::prefix('teacher')
-            ->middleware(['web','auth', 'teacher'])
+            ->middleware(['web','auth', 'teacher', 'product.only'])
             ->namespace($this->teacherNamespace)
             ->group(base_path('routes/teacher.php'));
     }

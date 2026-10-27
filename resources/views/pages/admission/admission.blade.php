@@ -1,35 +1,31 @@
 @extends('layouts.admission')
+@section('title', 'Admission. '.(($school->name ?? '') ?: 'Orangebook'))
 @section('content')
-    <div class="w-full lg:mx-2">
-        <div class="bg-white shadow py-3">
-            <div class="container mx-auto px-3 lg:px-0">
-                <div>
-                    <a href="{{ url('/') }}">
-                        <img src="{{ $logo }}" class="inline-block" style="height:55px;">
-                    </a>
-                </div>
-            </div>
-        </div>
+    <header class="ob-adm-bar">
+        @if($logo && !str_contains($logo, 'demologo'))
+            <img src="{{ $logo }}" alt="" onerror="this.remove()">
+        @endif
+        <strong>{{ ($school->name ?? '') ?: 'Orangebook' }}</strong>
+    </header>
+    <main class="ob-adm">
         @if($admission_open['meta_value']=="1")
-            <h1 class="admin-h1 my-3 flex items-center">       
-                <span class="mx-3">Admission Form</span>
-            </h1>
+            <h1 class="admin-h1">Admission form</h1>
+            <p class="ob-adm-sub">Fill each step. You can go back before you submit.</p>
             @include('partials.message')
-            <!-- multistep form -->
-            <form method="POST" action="" enctype="multipart/form-data" id="msform" class="w-full lg:w-1/2 mx-auto">
+            <form method="POST" action="" enctype="multipart/form-data" id="msform">
                 @csrf
                 <add-admission url="{{ url('/') }}" slug="{{ $slug }}"></add-admission>
                 <div id="add_admissionform"></div>
             </form>
-
-        @elseif($admission_open['meta_value']=="0")
-            <h1 class="admin-h1 my-3 flex items-center">       
-                <span class="mx-3">{{ $closedetails['meta_value'] }}</span>
-            </h1>
         @else
-        <h1 class="admin-h1 my-3 flex items-center">       
-                <span class="mx-3">Admission Not Opened</span>
-            </h1>    
+            <div class="ob-adm-closed">
+                <p class="ob-kicker">Admission</p>
+                <h1 class="admin-h1">{{ ($admission_open['meta_value'] ?? null) === "0" && !empty($closedetails['meta_value']) ? $closedetails['meta_value'] : 'Admission is not open yet.' }}</h1>
+                <p class="ob-adm-sub">Check back later, or contact the school office for dates.</p>
+                @if(!empty($school?->email))
+                    <a class="crest-btn crest-btn-ghost" href="mailto:{{ $school->email }}">Email the school</a>
+                @endif
+            </div>
         @endif
-    </div>
+    </main>
 @endsection

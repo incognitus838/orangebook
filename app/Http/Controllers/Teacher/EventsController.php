@@ -50,42 +50,29 @@ class EventsController extends Controller
         //$this->academic_year=$this->academic_year->id;
     }
 
-    function index()
+    function index(\App\Services\SchoolBoardService $board)
     {
-      //
-      $school_id      =   Auth::user()->school_id;
-      $academic_year  =   $this->academic_year;
-      
-      $events         =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id]]);
+        return view('crest.board.calendar', [
+            'layout' => 'layouts.teacher.layout',
+            'events' => $board->events(Auth::user()->school_id),
+            'action' => url('/teacher/events'),
+            'canAdd' => true,
+        ]);
+    }
 
-      //new 
-      if(!config('gexam.enabled', false))
-      {
-        $events =$events->where('category','!=','exam');
-      }
-
-      $events         =$events ->get();
-
-      $count          =   Events::where([['school_id',$school_id],['academic_year_id',$academic_year->id],['category','!=','holidays']])->count();
-      $subscription   =   Subscription::where('school_id',$school_id)->first();
-
-      $events = $events->map(function( $event, $key) {
-          $eventData = [ 
-              'id' =>   $event->id,
-              'title' => $event->title, 
-               //'start'=>  $event->start_date->format('Y-m-d').'T'.$event->start_date->format('H:i:s'), 
-              //'end'=> $event->end_date->format('Y-m-d').'T'.$event->end_date->format('H:i:s'),
-
-             'start'=>  date('Y-m-d', strtotime($event->start_date)).'T'.date('H:i:s', strtotime($event->start_date)),
-              'end'=>  date('Y-m-d', strtotime($event->end_date)).'T'.date('H:i:s', strtotime($event->end_date)),
-              'allDay' => $event->allDay 
-            ];
-            //dump($eventData);
-          return $eventData;
-      });
-      $events = json_encode($events);
-       
-      return view('teacher.events.index',['events'=>$events , 'count'=>$count , 'subscription'=>$subscription]);
+    public function storeDate(\Illuminate\Http\Request $request, \App\Services\SchoolBoardService $board)
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'title' => 'required|string|max:120',
+            'notes' => 'nullable|string|max:500',
+        ]);
+        $board->addEvent(Auth::user(), $data);
+        $qs = http_build_query(array_filter([
+            'view' => $request->input('view', 'month'),
+            'month' => $request->input('month'),
+        ]));
+        return redirect('/teacher/events'.($qs ? '?'.$qs : ''))->with('successmessage', 'Date added.');
     }
 
     public function list()

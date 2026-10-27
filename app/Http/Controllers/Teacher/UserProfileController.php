@@ -5,7 +5,7 @@
  */
 namespace App\Http\Controllers\Teacher;
 
-use App\Http\Requests\TeacherAvatarAddRequest;
+use App\Http\Requests\ChangeAvatarRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
@@ -59,8 +59,34 @@ class UserProfileController extends Controller
             );        
         } 
            
-        $res['message']=__('admin_userprofile.password_update');
-        return $res;
+        return redirect()->back()->with('successmessage', 'Password saved.');
+    }
+
+    public function edit()
+    {
+        return view('/teacher/editprofile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = User::findOrFail(Auth::id());
+        $data = $request->validate([
+            'name' => 'required|string|max:80|unique:users,name,'.$user->id,
+            'email' => 'required|email|max:120|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+        ]);
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->mobile_no = $data['phone'] ?: $user->mobile_no;
+        $user->save();
+        $parts = preg_split('/\s+/', trim($data['name']), 2);
+        $profile = Userprofile::where('user_id', $user->id)->first();
+        if ($profile) {
+            $profile->firstname = $parts[0];
+            $profile->lastname = $parts[1] ?? $profile->lastname;
+            $profile->save();
+        }
+        return redirect('/teacher/editprofile')->with('successmessage', 'Profile saved.');
     }  
 
     /**
@@ -99,26 +125,18 @@ class UserProfileController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    public function updatechangeavatar(TeacherAvatarAddRequest $request)
+    public function updatechangeavatar(ChangeAvatarRequest $request)
     {
         try
         {
             $userprofile = Userprofile::where('user_id', Auth::id())->first();
-            if($request->avatar!='')
-            {
-                $image_parts    =  explode(";base64,",$request->avatar);
-                $image_type_aux =  explode("image/",$image_parts[0]);
-                $image_type     =  $image_type_aux[1];
-                $image_base64   =  base64_decode($image_parts[1]);
-                $location       =  Auth::user()->school->slug.'/uploads/admin/teacher/avatar/';
-                $file           =  uniqid() .'.jpg';
-                $upload_path    =  $location.$file;
-                $this->putContents($upload_path, $image_base64);
-            
-                $userprofile->avatar = $upload_path;
+            if (!$userprofile) {
+                return redirect()->back()->with('failmessage', 'No profile to attach a photo to.');
+            }
+            $path = \Storage::putFile(Auth::user()->school->slug.'/uploads/avatars', $request->avatar, 'public');
+            if ($path != '') {
+                $userprofile->avatar = $path;
                 $userprofile->save();
-
-                $res['message'] = __('admin_userprofile.update_avatar');
             }
 
             $ip= $this->getRequestIP();
@@ -127,13 +145,13 @@ class UserProfileController extends Controller
                 Auth::user(),
                 ['ip' => $ip, 'details' => $_SERVER['HTTP_USER_AGENT'] ],
                 LOGNAME_CHANGE_AVATAR,
-                $res['message']
-            );  
-            return $res; 
+                'Changed Avatar'
+            );
+            return redirect()->back()->with('successmessage', 'Photo saved.');
         }
         catch(Exception $e)
         {
-            //dd($e->getMessage());
+            return redirect()->back()->with('failmessage', 'Could not save that photo.');
         }
     }
 }

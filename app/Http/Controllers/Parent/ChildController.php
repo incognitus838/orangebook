@@ -6,9 +6,13 @@ use App\Helpers\SiteHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Parent\Concerns\FindsChildren;
 use App\Models\Attendance;
+use App\Models\Homework;
 use App\Models\Notes;
+use App\Models\SendMail;
+use App\Models\StudentHomework;
 use App\Services\ResultsService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class ChildController extends Controller
 {
@@ -28,10 +32,42 @@ class ChildController extends Controller
             ->take(10)
             ->get();
 
+        $classId = optional($child->studentAcademicLatest)->standardLink_id;
+        $homeworks = collect();
+        $doneIds = collect();
+        if ($classId) {
+            $homeworks = Homework::with('subject')
+                ->where('standardLink_id', $classId)
+                ->where('status', 'publish')
+                ->orderByDesc('id')
+                ->take(12)
+                ->get();
+            $doneIds = StudentHomework::where('user_id', $child->id)
+                ->whereIn('homework_id', $homeworks->pluck('id'))
+                ->pluck('homework_id');
+        }
+
+        $year = SiteHelper::getAcademicYear($child->school_id);
+        $attendanceRows = Attendance::where('user_id', $child->id)
+            ->where('academic_year_id', $year->id)
+            ->orderByDesc('date')
+            ->take(10)
+            ->get();
+
+        $circulars = SendMail::where('school_id', $child->school_id)
+            ->where('to', Auth::user()->email)
+            ->orderByDesc('id')
+            ->take(8)
+            ->get();
+
         return view('parent.child', [
             'child' => $child,
             'report' => $report,
             'remarks' => $remarks,
+            'homeworks' => $homeworks,
+            'doneIds' => $doneIds,
+            'attendanceRows' => $attendanceRows,
+            'circulars' => $circulars,
         ]);
     }
 

@@ -5,18 +5,35 @@ include ('addon.php');
 
 Route::get( '/dashboard', 'DashboardController@index' )->name( 'dashboard' );
 
-Route::get('/crest/branding', 'CrestOpsController@branding');
-Route::post('/crest/branding', 'CrestOpsController@saveBranding');
-Route::get('/crest/billing', 'CrestOpsController@billing');
-Route::post('/crest/billing', 'CrestOpsController@changePlan');
-Route::get('/crest/invite-teacher', 'CrestOpsController@inviteTeacher');
-Route::post('/crest/invite-teacher', 'CrestOpsController@storeTeacher');
-Route::get('/crest/link-parent', 'CrestOpsController@linkParent');
-Route::post('/crest/link-parent', 'CrestOpsController@storeParentLink');
-Route::get('/crest/mail', 'CircularController@create');
-Route::post('/crest/mail', 'CircularController@store');
-Route::get('/crest/mail/log', 'CircularController@log');
-Route::get('/crest/mail/count', 'CircularController@count');
+Route::get('/branding', 'CrestOpsController@branding');
+Route::post('/branding', 'CrestOpsController@saveBranding');
+Route::get('/billing', 'CrestOpsController@billing');
+Route::post('/billing', 'CrestOpsController@changePlan');
+Route::get('/people', fn () => redirect('/admin/teachers'));
+Route::post('/people/staff', 'CrestOpsController@storeTeacher');
+Route::post('/people/parent', 'CrestOpsController@storeParentLink');
+Route::post('/people/staff/bulk', 'CrestOpsController@storeTeacherBulk');
+Route::post('/people/parent/bulk', 'CrestOpsController@storeParentBulk');
+Route::post('/groups', 'CrestOpsController@storeGroup');
+Route::get('/invite-teacher', fn () => redirect('/admin/teacher/add'));
+Route::post('/invite-teacher', 'CrestOpsController@storeTeacher');
+Route::get('/link-parent', fn () => redirect('/admin/parents/import'));
+Route::post('/link-parent', 'CrestOpsController@storeParentLink');
+Route::get('/mail', fn () => redirect('/admin/announcements'));
+Route::post('/mail', 'AnnouncementController@store');
+Route::get('/mail/log', fn () => redirect('/admin/announcements'));
+Route::get('/mail/count', 'CircularController@count');
+Route::get('/announcements', 'AnnouncementController@index');
+Route::post('/announcements', 'AnnouncementController@store');
+Route::post('/announcements/{id}/archive', 'AnnouncementController@archive')->whereNumber('id');
+Route::post('/announcements/{id}', 'AnnouncementController@update')->whereNumber('id');
+Route::delete('/announcements/{id}', 'AnnouncementController@destroy')->whereNumber('id');
+Route::redirect('/crest/branding', '/admin/branding');
+Route::redirect('/crest/billing', '/admin/billing');
+Route::redirect('/crest/invite-teacher', '/admin/invite-teacher');
+Route::redirect('/crest/link-parent', '/admin/link-parent');
+Route::redirect('/crest/mail', '/admin/mail');
+Route::redirect('/crest/mail/log', '/admin/mail/log');
 Route::get( '/dashboard/event', 'DashboardController@event' );
 Route::get( '/dashboard/structuralList', 'DashboardController@structuralList' );
 Route::post( '/dashboard/structuralList', 'DashboardController@showStructuralList' );
@@ -30,6 +47,8 @@ Route::get( '/dashboard/task/count','DashboardController@listCount' );
 //admission
 Route::get(	'/admissionlist','AdmissionController@admissionlist' );
 Route::get(	'/admissions','AdmissionController@index' );
+Route::post( '/admissions','AdmissionController@storeSimple' );
+Route::post( '/admissions/{id}/approve','AdmissionController@approveSimple' );
 Route::get( '/admission/show/{id}', 'AdmissionController@show' );
 Route::get( '/admission/edit/{id}', 'AdmissionController@edit' );
 Route::post( '/admission/update/{id}', 'AdmissionController@update' );
@@ -57,6 +76,7 @@ Route::post( '/dashboard/workAnniversary', 'BirthdayController@workAnniversaryMe
 
 //school details
 Route::get( '/schooldetails', 'SchoolDetailsController@index' );
+Route::post( '/schooldetails', 'SchoolDetailsController@saveSimple' );
 //Route::get( '/schooldetails/list', 'SchoolDetailsController@list' );
 //Route::get( '/schooldetails/create', 'SchoolDetailsController@create' );
 //Route::post( '/schooldetails/create/validationStore', 'SchoolDetailsController@validationStore' );
@@ -69,6 +89,9 @@ Route::post( '/schooldetails/update/{school_id}', 'SchoolDetailsController@updat
 //academics
 	//index
 	Route::get( '/academics', 'AcademicYearController@index' );
+	Route::post( '/academics', 'AcademicYearController@storeYear' );
+	Route::post( '/academics/term/{id}/current', 'AcademicYearController@makeTermCurrent' );
+	Route::post( '/academics/{id}/current', 'AcademicYearController@makeCurrent' );
 	Route::get( '/academic/list', 'AcademicYearController@list' );
 
 	//add
@@ -105,6 +128,23 @@ Route::post( '/schooldetails/update/{school_id}', 'SchoolDetailsController@updat
 //standardlinks
 	//index
 	Route::get( '/standardlinks', 'StandardsLinkController@index' );
+	Route::post( '/standardlinks', 'StandardsLinkController@storeSimple' );
+	Route::post( '/standardlinks/levels', 'StandardsLinkController@storeLevel' );
+	Route::post( '/standardlinks/levels/{id}', 'StandardsLinkController@renameLevel' );
+	Route::post( '/standardlinks/levels/{id}/archive', 'StandardsLinkController@archiveLevel' );
+	Route::post( '/standardlinks/levels/{id}/{dir}', 'StandardsLinkController@moveLevel' )->where('dir', 'up|down');
+	Route::post( '/standardlinks/arms', 'StandardsLinkController@storeArm' );
+	Route::post( '/standardlinks/arms/{id}', 'StandardsLinkController@renameArm' );
+	Route::post( '/standardlinks/arms/{id}/archive', 'StandardsLinkController@archiveArm' );
+	Route::post( '/standardlinks/preset', 'StandardsLinkController@applyPreset' );
+	Route::post( '/standardlinks/copy-year', 'StandardsLinkController@copyYear' );
+	Route::post( '/standardlinks/catalog', 'StandardsLinkController@storeCatalog' );
+	Route::post( '/standardlinks/catalog/apply', 'StandardsLinkController@applyCatalog' );
+	Route::post( '/standardlinks/catalog/{id}/archive', 'StandardsLinkController@archiveCatalog' );
+	Route::post( '/standardlinks/{id}/teacher', 'StandardsLinkController@assignTeacher' );
+	Route::post( '/standardlinks/{id}/subject', 'StandardsLinkController@addSubject' );
+	Route::post( '/standardlinks/{id}/subject/{linkId}/teacher', 'StandardsLinkController@assignSubjectTeacher' );
+	Route::post( '/standardlinks/{id}/subject/{linkId}/remove', 'StandardsLinkController@removeSubject' );
 	Route::get( '/getStandard', 'StandardsLinkController@getStandard' );
 	//add
 	Route::get( '/standardLink/list', 'StandardsLinkController@list' );
@@ -195,8 +235,18 @@ Route::get( '/activity', 'ActivityLogController@index' );
 //students
 	//index
 	Route::get( '/students/find', 'StudentController@find' );
+	Route::get( '/students/slips', 'StudentController@slips' );
+	Route::get( '/students/bulk', 'StudentImportController@bulk' );
+	Route::get( '/students/import/template', 'StudentImportController@template' );
+	Route::get( '/students/import/errors', 'StudentImportController@errors' );
+	Route::get( '/students/import', 'StudentImportController@import' );
+	Route::post( '/students/import/preview', 'StudentImportController@preview' );
+	Route::post( '/students/import/confirm', 'StudentImportController@confirm' );
+	Route::get( '/students/intake', 'StudentImportController@intake' );
 	Route::get( '/students', 'StudentController@index' );
 	Route::get( '/students/blockedstudents', 'StudentController@blockedstudents' );
+	Route::get( '/students/{id}', 'StudentDetailsController@showById' )->whereNumber('id');
+	Route::post( '/students/{id}', 'StudentDetailsController@updateById' )->whereNumber('id');
 	//add
 	Route::get( '/student/add', 'StudentController@create' );
 	Route::get( '/student', 'StudentController@member' );
@@ -211,6 +261,7 @@ Route::get( '/activity', 'ActivityLogController@index' );
 	Route::get( '/student/show/attendance/{name}', 'StudentDetailsController@showAttendance' );
 	Route::get( '/student/show/libraryactivity/{name}', 'StudentDetailsController@showBookLent' );
 	Route::get( '/student/show/{name}', 'StudentDetailsController@show' );
+	Route::post( '/student/show/{name}', 'StudentDetailsController@updateSimple' );
 	Route::get( '/student/showmark/{name}', 'StudentDetailsController@showmark' );
 	Route::get( '/student/showallmark/{name}', 'StudentDetailsController@showAllMark' );
 	//Route::get( '/student/comparemark/{name}', 'StudentDetailsController@compareMarks' );
@@ -244,15 +295,22 @@ Route::get( '/activity', 'ActivityLogController@index' );
 	//index
 	Route::get( '/parent/list', 'ParentController@list' );
 	Route::get( '/parents', 'ParentController@index' );
+	Route::get( '/parents/import/template', 'ParentController@importTemplate' );
+	Route::get( '/parents/import', 'ParentController@importForm' );
+	Route::post( '/parents/import/preview', 'ParentController@importPreview' );
+	Route::post( '/parents/import/confirm', 'ParentController@importConfirm' );
 	//delete
 	Route::delete('/parent/delete/{name}','ParentController@destroy');
 	//add
 	Route::get( '/parent/get', 'ParentController@addList' );
 	Route::post( '/parent/add/validationParent', 'ParentController@validationParent' );
 	Route::get( '/parent/add', 'ParentController@create' );
-	Route::post( '/parent/add', 'ParentController@store' );
+	Route::post( '/parent/add', 'ParentController@storeSimple' );
 	//show
 	Route::get( '/parent/show/{name}', 'ParentController@show' );
+	Route::post( '/parent/show/{name}', 'ParentController@updateSimple' );
+	Route::post( '/parent/show/{name}/child', 'ParentController@linkChild' );
+	Route::post( '/parent/show/{name}/child/{student}/remove', 'ParentController@unlinkChild' );
 	Route::get( '/parent/show/children/{name}', 'ParentController@showChildren' );
 	Route::get( '/parent/show/activity/{name}', 'ParentController@showActivityLog' );
 	Route::get( '/parent/show/feedback/{name}', 'ParentController@showFeedbacks' );
@@ -265,6 +323,11 @@ Route::get( '/activity', 'ActivityLogController@index' );
 //teacher
 	//index
 	Route::get( '/teachers/find', 'TeacherListController@find' );
+	Route::get( '/teachers/bulk', 'StaffImportController@bulk' );
+	Route::get( '/teachers/import/template', 'StaffImportController@template' );
+	Route::get( '/teachers/import', 'StaffImportController@import' );
+	Route::post( '/teachers/import/preview', 'StaffImportController@preview' );
+	Route::post( '/teachers/import/confirm', 'StaffImportController@confirm' );
 	Route::get( '/teachers', 'TeacherListController@index' );
 	//delete
 	Route::delete('/teacher/delete/{name}','TeacherListController@destroy');
@@ -288,6 +351,7 @@ Route::get( '/activity', 'ActivityLogController@index' );
 	Route::get( '/teacher/show/activity/{name}', 'TeacherShowController@showActivity' );
 	Route::get( '/teacher/show/logactivity/{name}', 'TeacherShowController@showActivityLog' );
 	Route::get( '/teacher/show/{name}', 'TeacherShowController@show' );
+	Route::post( '/teacher/show/{name}', 'TeacherShowController@updateSimple' );
 	//edit
 	Route::get( '/teacher/editTeacher/{name}', 'TeacherEditController@editTeacher' );
 	Route::get( '/teacher/edit/{name}', 'TeacherEditController@edit' );
@@ -299,13 +363,16 @@ Route::get( '/activity', 'ActivityLogController@index' );
 	//export
 	Route::get( '/exportTeachers', 'TeacherImportExportController@export' );
 	//import
-	Route::get( '/import/teacher', 'TeacherImportExportController@importCreate' );
-	Route::post( '/importTeachers', 'TeacherImportExportController@import' );
-	Route::get( '/downloadformat/teacher', 'TeacherImportExportController@downloadFormat' );
+	Route::get( '/import/teacher', fn () => redirect('/admin/teachers/import') );
+	Route::post( '/importTeachers', fn () => redirect('/admin/teachers/import') );
+	Route::get( '/downloadformat/teacher', fn () => redirect('/admin/teachers/import/template') );
 
 //promotion
 Route::get( '/promotion/list', 'PromotionController@index' );
-Route::get( '/promotion/create', 'PromotionController@create' );
+Route::get( '/promotions', 'PromotionController@create' );
+Route::post( '/promotions', 'PromotionController@promote' );
+Route::get( '/promotion/create', fn () => redirect('/admin/promotions') );
+Route::post( '/promotion', 'PromotionController@promote' );
 Route::post( '/promotion/export', 'PromotionController@export' );
 Route::post( '/promotion/import', 'PromotionController@import' );
 
@@ -337,6 +404,7 @@ Route::get( '/standardLink/id-card-print/{id}', 'StandardsLinkController@printid
 
 //recurring events
 Route::get( '/events', 'EventsController@index' );
+Route::post( '/events', 'EventsController@storeDate' );
 Route::get( '/events/list', 'EventsController@list' );
 Route::get( '/events/show', 'EventsController@events' );
 Route::post( '/events/create', 'EventsController@store' );
@@ -353,7 +421,9 @@ Route::get( '/event/approve/{id}', 'EventsController@eventapprove' );
 
 //Settings
 //Route::get( 'settings/', 'SettingController@index' );
-Route::get( '/settings/generalsettings', 'Setting\GeneralController@create' );
+Route::get( '/marks', 'Setting\GeneralController@create' );
+Route::post( '/marks', 'Setting\GeneralController@store' );
+Route::get( '/settings/generalsettings', fn () => redirect('/admin/marks') );
 Route::post( '/settings/generalsettings', 'Setting\GeneralController@store' );
 Route::get( '/settings/maintenancesettings', 'Setting\MaintenanceController@create' );
 Route::post( '/settings/maintenancesettings', 'Setting\MaintenanceController@store' );
@@ -370,6 +440,7 @@ Route::post( '/changeavatar', 'UserProfileController@updatechangeavatar' );
 Route::get( '/getavatar', 'UserProfileController@getavatar' );
 
 Route::get( '/editprofile', 'UserProfileController@edit' );
+Route::post( '/editprofile', 'UserProfileController@updateProfile' );
 Route::get( '/profile', 'UserProfileController@create' );
 Route::post( '/profile', 'UserProfileController@update' );
 
@@ -390,9 +461,9 @@ Route::get( '/staff/export', 'StaffController@staffexports' );
 
 //import
 
-Route::get( '/import', 'ImportMemberController@index' );
-Route::post( '/importUsers', 'ImportMemberController@importUsers' );
-Route::get( '/downloadformat', 'ImportMemberController@downloadFormat' );
+Route::get( '/import', fn () => redirect('/admin/students/import') );
+Route::post( '/importUsers', fn () => redirect('/admin/students/import') );
+Route::get( '/downloadformat', fn () => redirect('/admin/students/import/template') );
 
 //without approval homework -- do not remove
 /*//homework
@@ -419,7 +490,8 @@ Route::get( '/downloadformat', 'ImportMemberController@downloadFormat' );
 //with approval  
 //homework
 	//index
-	Route::get( '/homeworks', 'Approval\HomeWorkController@index' );
+	Route::get( '/homeworks', 'HomeworkBoardController@index' );
+	Route::post( '/homeworks', 'HomeworkBoardController@store' );
 
 	Route::post( '/homework/status/update', 'Approval\HomeworkApprovalController@update' );
 
@@ -470,7 +542,8 @@ Route::get( '/downloadformat', 'ImportMemberController@downloadFormat' );
 
 //noticeboard
 	//index
-	Route::get( '/notices', 'NoticeBoardController@index' );
+	Route::get( '/notices', fn () => redirect('/admin/announcements') );
+	Route::post( '/notices', 'AnnouncementController@store' );
 	//add
 	Route::get( '/notice/list', 'NoticeBoardController@list' );
 	Route::get( '/notice/add', 'NoticeBoardController@create' );
@@ -745,10 +818,10 @@ Route::get( '/teacher/attendances/show/{name}', 'StaffAttendanceController@getSt
 Route::get( '/teacher/show/attendance/{name}', 'StaffAttendanceController@showAttendance');
 
 Route::get( '/staffs/find', 'StaffController@find');
-Route::get( '/staffs', 'StaffController@index');
+Route::get( '/staffs', fn () => redirect('/admin/teachers?role=nonteaching') );
 Route::get( '/staff/show/{name}', 'StaffController@show');
 Route::delete('/staff/delete/{name}','StaffController@destroy');
-Route::get( '/staff/add', 'StaffController@create');
+Route::get( '/staff/add', fn () => redirect('/admin/teacher/add') );
 Route::post( '/staff/add', 'StaffController@store');
 Route::get( '/staff/edit/{name}', 'StaffController@edit');
 Route::post( '/staff/edit/{name}', 'StaffController@update');
@@ -878,7 +951,7 @@ Route::get('/purchase/addon/histories', function () {
     })->name('admin.setting.smstemplate.update');
 
     Route::get('settings/standards', function () {
-		return view('admin.standard.index');
+		return redirect('/admin/standardlinks?tab=levels');
 	})->name('admin.standards');
 
 	Route::get('setting/standard/create', function () {

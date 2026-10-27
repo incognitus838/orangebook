@@ -1,23 +1,23 @@
-<!-- <!DOCTYPE html> -->
+<!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>@yield('title', 'Admission')</title>
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500&family=IBM+Plex+Sans:wght@500;600;700&family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <link href="{{ asset('css/crest.css') }}" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600&family=Instrument+Serif&display=swap" rel="stylesheet">
+        <link href="{{ asset('css/ob-paper.css') }}?v={{ @filemtime(public_path('css/ob-paper.css')) }}" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+        <link href="{{ asset('css/ob-saas.css') }}?v={{ @filemtime(public_path('css/ob-saas.css')) }}" rel="stylesheet">
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
     </head>
-    <body class="font-primary">
+    <body class="font-primary ob-app ob-admission">
         <div id="app">
             <div class="w-full h-full overflow-auto">
-                <div class="bg-white shadow py-3">
-                    <div class="container mx-auto px-3 lg:px-0">
-                        <div>
-                            <!-- <a href="{{ url('/') }}">
-                                <img src="{{ asset('images/gego_k12.png') }}" class="inline-block" style="height:55px;" alt="GegoK12 Logo">
-                            </a> -->
-                        </div>
-                    </div>
-                </div>
                 @yield('content')
             </div>
         </div>

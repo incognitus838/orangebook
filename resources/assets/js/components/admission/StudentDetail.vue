@@ -133,11 +133,7 @@
                 </div>
 
                 <div class="flex flex-col lg:flex-row">
-                    <div class="my-1 w-full lg:w-1/2 lg:mr-2">
-                        <label for="aadhar_number" class="tw-form-label">Aadhaar Number</label>
-                        <input type="text" name="aadhar_number" v-model="aadhar_number" placeholder="Aadhar Number" class="tw-form-control w-full my-1 py-2">
-                        <span v-if="errors.aadhar_number" class="text-red-500 text-xs font-semibold">{{ errors.aadhar_number[0] }}</span>
-                    </div>
+
                     <div class="w-full lg:w-1/2 lg:mr-2 my-1">
                         <label for="blood_group" class="tw-form-label">Blood Group</label>
                         <select name="blood_group" id="type" v-model="blood_group" class="tw-form-control w-full my-1 py-2">

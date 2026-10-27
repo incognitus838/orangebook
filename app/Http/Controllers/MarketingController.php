@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Plan;
-
 class MarketingController extends Controller
 {
     public function home()
     {
-        $plans = Plan::where('is_active', 1)->orderBy('order')->get();
-        return view('marketing.home', ['plans' => $plans]);
+        return view('marketing.home');
+    }
+
+    public function privacy()
+    {
+        return view('marketing.privacy');
+    }
+
+    public function terms()
+    {
+        return view('marketing.terms');
     }
 }

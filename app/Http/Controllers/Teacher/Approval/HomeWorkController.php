@@ -86,15 +86,9 @@ class HomeWorkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    { 
-        if(Auth::user()->hasRole('principal'))
-        {
-            $role = 'principal';
-        }
-        $query = \Request::getQueryString();
-
-        return view('/teacher/homework/index' ,['role' => $role,'query' => $query]);
+    public function index(\App\Services\SchoolBoardService $board)
+    {
+        return app(\App\Http\Controllers\Teacher\HomeworkBoardController::class)->index($board);
     }
 
     /**

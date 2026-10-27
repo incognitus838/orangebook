@@ -53,6 +53,7 @@ Route::get( '/assignment/delete/{id}', 'AssignmentController@destroy' );
 //index
 Route::get( '/homework/show/list', 'HomeworkController@showList' );
 Route::get( '/homeworks', 'HomeworkController@index' );
+Route::post( '/homeworks/{id}/done', 'HomeworkController@done' );
 //add
 Route::get( '/homework/list', 'HomeworkController@list' );
 Route::get( '/homework/add', 'HomeworkController@create' );
