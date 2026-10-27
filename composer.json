@@ -1,11 +1,12 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "incognitus838/orangebook",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Orangebook — school records for Nigerian classrooms.",
     "keywords": [
+        "orangebook",
         "laravel",
-        "framework"
+        "school"
     ],
     "license": "MIT",
     "require": {

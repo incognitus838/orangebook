@@ -106,7 +106,7 @@ This path **already exists** in core (exam scores are the addon):
 
 ## Run locally (this machine)
 
-PHP 8.4, Composer, and MySQL are installed via Homebrew. From `/Users/mac/Projects/crest`:
+PHP 8.4, Composer, and MySQL are installed via Homebrew. From `/Users/mac/Projects/orangebook`:
 
 ```bash
 export PATH="/opt/homebrew/opt/php@8.4/bin:/opt/homebrew/bin:$PATH"

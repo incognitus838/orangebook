@@ -1,6 +1,6 @@
 # Prompt for Grok: Orangebook admin fixes (schools, NGOs, training firms)
 
-You are working in a Laravel 12 / PHP 8.4 app at `/Users/mac/Projects/crest` (product name **Orangebook**, a fork of GegoK12). Read `CREST.md` first. Run it with `php artisan serve` on http://127.0.0.1:8000. Demo login: school admin `demoschool@mailinator.com` / `password` (others are listed in CREST.md).
+You are working in a Laravel 12 / PHP 8.4 app at `/Users/mac/Projects/orangebook` (product name **Orangebook**, a fork of GegoK12). Read `ORANGEBOOK.md` first. Run it with `php artisan serve` on http://127.0.0.1:8000. Demo login: school admin `demoschool@mailinator.com` / `password` (others are listed in ORANGEBOOK.md).
 
 ## Ground rules
 
@@ -206,7 +206,7 @@ Today you can only pick an existing Year (`standards`) and Arm (`sections`). Cre
 - Make sure it fits with the existing **Promotions** (`/admin/promotions`) and **Admissions** (`/admin/admissions`, public `/{slug}/admission-form`):
   - an approved admission should appear in the intake list as a pre-filled row
   - promotion moves existing learners up, while intake creates the entry level
-  - write a short note in CREST.md explaining the three
+  - write a short note in ORANGEBOOK.md explaining the three
 
 ### F. Kind differences
 - **NGO:** "Learners", "Cohorts", "Facilitators". No parent fields. Entry level is usually Cohort 1. Admission numbers use a prefix like `PRG/26/0001`.
@@ -280,7 +280,7 @@ Also run the same audit for `routes/teacher.php`, `routes/student.php` and `rout
 - [x] No route in the RouteSmokeTest returns 500.
 - [x] No new code sets the password `password` or invents phone numbers.
 - [x] `php artisan test` passes, and each new endpoint has a cross-tenant test.
-- [x] CREST.md is updated with the new screens and the Intake / Admissions / Promotions note.
+- [x] ORANGEBOOK.md is updated with the new screens and the Intake / Admissions / Promotions note.
 
 Work in small commits, one section at a time, in this order:
 1. 4A (identity)
